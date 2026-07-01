@@ -6,19 +6,13 @@
 <title>2026年DM合宿投資計画</title>
 <style>
   :root {
-    --bg: #f0f2f5;
-    --surface: #ffffff;
-    --surface2: #f7f8fa;
-    --accent: #4a6fa5;
-    --accent2: #e8a838;
-    --gold: #e8a838;
-    --text: #1e2433;
-    --muted: #7a8299;
-    --border: #dde2ea;
+    --bg: #f0f2f5; --surface: #ffffff; --surface2: #f7f8fa;
+    --accent: #4a6fa5; --accent2: #e8a838; --gold: #e8a838;
+    --text: #1e2433; --muted: #7a8299; --border: #dde2ea;
     --pass: #3aaa7e;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', sans-serif; min-height: 100vh; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI','Hiragino Kaku Gothic ProN',sans-serif; min-height: 100vh; }
   .screen { display: none; }
   .screen.active { display: block; }
 
@@ -29,17 +23,25 @@
   .app-header .sub { color: rgba(255,255,255,0.8); font-size: 13px; margin-left: auto; }
 
   /* ADMIN */
-  #admin-screen { padding: 20px; max-width: 700px; margin: 0 auto; }
+  #admin-screen { padding: 0 20px 40px; max-width: 700px; margin: 0 auto; }
   .page-title { text-align: center; padding: 24px 0 18px; font-size: 22px; font-weight: 800; color: var(--accent); }
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
   .card h2 { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
-  .plan-inputs { display: flex; flex-direction: column; gap: 8px; }
-  .plan-row { display: grid; grid-template-columns: 1fr 2fr; gap: 8px; }
+  .plan-row { display: grid; grid-template-columns: 1fr 2fr; gap: 8px; margin-bottom: 8px; }
   .plan-row input { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; color: var(--text); font-size: 14px; width: 100%; }
   .plan-row input:focus { outline: none; border-color: var(--accent); background: #fff; }
   .primary-btn { background: var(--accent); color: white; border: none; border-radius: 10px; padding: 16px; font-size: 16px; font-weight: 700; cursor: pointer; width: 100%; }
-  .primary-btn:hover { opacity: 0.9; }
   .hint { font-size: 12px; color: var(--muted); text-align: center; margin-top: 8px; }
+  .footer-btn { border-radius: 8px; padding: 10px 18px; font-size: 13px; cursor: pointer; }
+  .footer-btn-csv { background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
+  .footer-btn-reset { background: none; border: 1px solid #e05555; color: #e05555; }
+
+  /* GAS URL 設定バナー */
+  .setup-banner { background: #fff8e1; border: 1px solid #ffe082; border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; font-size: 13px; line-height: 1.7; }
+  .setup-banner strong { color: #e65100; }
+  .url-input-row { display: flex; gap: 8px; margin-top: 10px; }
+  .url-input-row input { flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 13px; }
+  .url-input-row button { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
 
   /* NAME SELECT */
   #name-select-screen { max-width: 500px; margin: 0 auto; padding: 0 20px 40px; }
@@ -74,7 +76,6 @@
   .section-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
   .comment-textarea { width: 100%; border: 2px solid var(--border); border-radius: 12px; padding: 14px; font-size: 15px; font-family: inherit; resize: none; height: 130px; background: var(--surface); color: var(--text); outline: none; transition: border-color 0.2s; }
   .comment-textarea:focus { border-color: var(--accent); }
-  /* 提案チップ（コンパクト2列グリッド） */
   .plan-chips { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .plan-chip { background: var(--surface); border: 2px solid var(--border); border-radius: 10px; padding: 10px 12px; cursor: pointer; font-size: 13px; font-weight: 600; text-align: center; transition: all 0.15s; line-height: 1.3; }
   .plan-chip:hover { border-color: var(--accent); background: #eef2fa; }
@@ -96,7 +97,7 @@
   .budget-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
   .budget-fill { height: 100%; border-radius: 4px; transition: width 0.3s, background 0.3s; }
   .plans-container { flex: 1; padding: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-content: start; }
-  .plan-card { background: var(--surface); border: 2px solid var(--border); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+  .plan-card { background: var(--surface); border: 2px solid var(--border); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
   .plan-card.has-vote { border-color: var(--accent); background: #f5f8ff; }
   .plan-card.own-plan { opacity: 0.4; border-style: dashed; pointer-events: none; }
   .plan-name { font-size: 13px; font-weight: 700; word-break: break-all; line-height: 1.4; }
@@ -104,8 +105,7 @@
   .own-plan-notice { text-align: center; font-size: 12px; color: var(--muted); padding: 4px 0; }
   .vote-control { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
   .vote-btn { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border); background: var(--surface2); color: var(--text); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .vote-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); background: #eef2fa; }
-  .vote-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .vote-btn:hover { border-color: var(--accent); color: var(--accent); background: #eef2fa; }
   .vote-amount { font-size: 18px; font-weight: 900; text-align: center; min-width: 40px; }
   .vote-amount .unit { font-size: 10px; color: var(--muted); font-weight: 400; }
   .submit-area { padding: 14px 20px; background: var(--surface); border-top: 1px solid var(--border); }
@@ -113,17 +113,31 @@
   .submit-btn { background: var(--accent); color: white; border: none; border-radius: 10px; padding: 15px; font-size: 16px; font-weight: 700; cursor: pointer; width: 100%; }
   .submit-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
 
-  /* RESULTS */
+  /* RESULTS (意見・質問) */
   #results-screen { min-height: 100vh; }
-  .result-tabs { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 52px; z-index: 9; }
-  .result-tab { flex: 1; padding: 13px; text-align: center; font-size: 13px; font-weight: 600; color: var(--muted); border: none; background: none; cursor: pointer; border-bottom: 3px solid transparent; }
-  .result-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .refresh-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 20px; background: var(--surface2); border-bottom: 1px solid var(--border); font-size: 11px; color: var(--muted); }
+  .refresh-bar button { background: none; border: none; color: var(--accent); font-size: 12px; cursor: pointer; font-weight: 600; }
+  .comments-pane { padding: 14px 20px; display: flex; flex-direction: column; gap: 10px; }
+  .comment-plan-group { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .comment-plan-title { padding: 12px 16px; background: var(--surface2); font-size: 13px; font-weight: 700; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .comment-count-badge { font-size: 11px; background: var(--accent); color: white; padding: 2px 8px; border-radius: 10px; }
+  .comment-item { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .comment-item:last-child { border-bottom: none; }
+  .comment-meta { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .comment-text-content { font-size: 14px; line-height: 1.6; word-break: break-word; }
+  .all-comment-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .comment-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .comment-plan-tag { font-size: 11px; background: #eef2fa; color: var(--accent); padding: 2px 8px; border-radius: 10px; border: 1px solid #ccd5ea; display: inline-block; }
+  .no-comments { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; }
+
+  /* VOTE RESULTS */
+  #vote-results-screen { min-height: 100vh; }
   .results-summary { padding: 14px 20px; background: var(--surface2); border-bottom: 1px solid var(--border); display: flex; gap: 20px; flex-wrap: wrap; }
   .stat-box { text-align: center; }
   .stat-value { font-size: 26px; font-weight: 900; }
   .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
   .results-grid { padding: 14px 20px; display: flex; flex-direction: column; gap: 12px; }
-  .result-card { background: var(--surface); border: 2px solid var(--border); border-radius: 14px; padding: 16px; position: relative; overflow: hidden; }
+  .result-card { background: var(--surface); border: 2px solid var(--border); border-radius: 14px; padding: 16px; position: relative; }
   .result-card.passed { border-color: var(--pass); background: #f5fdf8; }
   .result-card.passed::before { content: "PASS"; position: absolute; top: 12px; right: 12px; background: var(--pass); color: white; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
   .result-card.failed::before { content: "FAIL"; position: absolute; top: 12px; right: 12px; background: var(--border); color: var(--muted); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
@@ -140,28 +154,11 @@
   .voter-bar-wrap { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
   .voter-bar { height: 100%; border-radius: 3px; background: var(--accent); }
   .voter-vote { width: 56px; text-align: right; font-size: 12px; }
-  /* コメント */
-  .comments-pane { padding: 14px 20px; display: flex; flex-direction: column; gap: 10px; }
-  .comment-plan-group { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-  .comment-plan-title { padding: 12px 16px; background: var(--surface2); font-size: 13px; font-weight: 700; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-  .comment-count-badge { font-size: 11px; background: var(--accent); color: white; padding: 2px 8px; border-radius: 10px; }
-  .comment-item { padding: 12px 16px; border-bottom: 1px solid var(--border); }
-  .comment-item:last-child { border-bottom: none; }
-  .comment-meta { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
-  .comment-text-content { font-size: 14px; line-height: 1.6; word-break: break-word; }
-  .all-comment-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
-  .comment-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
-  .comment-plan-tag { font-size: 11px; background: #eef2fa; color: var(--accent); padding: 2px 8px; border-radius: 10px; border: 1px solid #ccd5ea; display: inline-block; margin-bottom: 6px; }
-  .no-comments { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; }
-  .results-footer { padding: 14px 20px 30px; display: flex; gap: 8px; }
-  .footer-btn { border-radius: 8px; padding: 10px 18px; font-size: 13px; cursor: pointer; }
-  .footer-btn-csv { background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
-  .footer-btn-reset { background: none; border: 1px solid #e05555; color: #e05555; }
 
   /* MODAL */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; }
   .modal-overlay.open { display: flex; }
-  .modal { background: var(--surface); border-radius: 16px; padding: 26px; max-width: 360px; width: 90%; box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+  .modal { background: var(--surface); border-radius: 16px; padding: 26px; max-width: 400px; width: 92%; box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
   .modal h3 { font-size: 18px; margin-bottom: 12px; }
   .modal p { color: var(--muted); font-size: 14px; margin-bottom: 20px; line-height: 1.7; white-space: pre-wrap; }
   .modal-btns { display: flex; gap: 10px; }
@@ -178,27 +175,49 @@
   .toast-sub { font-size: 13px; color: var(--muted); line-height: 1.6; }
   .toast-btn { margin-top: 20px; color: white; border: none; border-radius: 10px; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; display: block; width: 100%; }
   .toast-link { margin-top: 10px; background: none; border: none; color: var(--muted); font-size: 13px; cursor: pointer; text-decoration: underline; }
+
+  /* LOADING */
+  .loading-overlay { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.85); z-index: 300; align-items: center; justify-content: center; flex-direction: column; gap: 14px; }
+  .loading-overlay.open { display: flex; }
+  .spinner { width: 40px; height: 40px; border: 4px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-overlay p { font-size: 14px; color: var(--muted); }
 </style>
 </head>
 <body>
 
 <!-- ADMIN -->
 <div id="admin-screen" class="screen active">
-  <div style="padding:0 20px;max-width:700px;margin:0 auto;">
-    <div class="page-title">2026年DM合宿投資計画</div>
-    <div class="card">
-      <h2>氏名と事業名を入力</h2>
-      <div style="display:grid;grid-template-columns:1fr 2fr;gap:8px;font-size:11px;color:var(--muted);padding:0 2px 8px;"><span>氏名</span><span>事業名</span></div>
-      <div class="plan-inputs" id="plan-inputs"></div>
+  <div class="page-title">2026年DM合宿投資計画</div>
+  <div id="setup-banner" class="setup-banner" style="display:none;">
+    <strong>⚙ 初期設定が必要です</strong><br>
+    Google Apps Scriptをデプロイして、WebアプリURLを入力してください。<br>
+    （<code>vote_backend.gs</code> をGASに貼り付け → デプロイ → URLをコピー）
+    <div class="url-input-row">
+      <input type="url" id="gas-url-input" placeholder="https://script.google.com/macros/s/..." />
+      <button onclick="saveGasUrl()">保存</button>
     </div>
-    <button class="primary-btn" onclick="startSession()">▶ 投票セッション開始</button>
-    <p class="hint">入力内容は自動保存されます</p>
+  </div>
+  <div class="card">
+    <h2>氏名と事業名を入力</h2>
+    <div style="display:grid;grid-template-columns:1fr 2fr;gap:8px;font-size:11px;color:var(--muted);padding:0 2px 8px;"><span>氏名</span><span>事業名</span></div>
+    <div id="plan-inputs"></div>
+  </div>
+  <button class="primary-btn" onclick="startSession()">▶ 投票セッション開始</button>
+  <p class="hint">入力内容はこの端末に自動保存されます</p>
+  <div style="display:flex;gap:8px;margin-top:14px;">
+    <button class="footer-btn footer-btn-csv" onclick="showVoteResults()" style="flex:1;">📊 投票集計を見る</button>
+    <button class="footer-btn footer-btn-csv" onclick="exportCSV()" style="flex:1;">CSV出力</button>
+  </div>
+  <div style="margin-top:8px;text-align:center;display:flex;align-items:center;justify-content:center;gap:16px;">
+    <button onclick="showBackups()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline;">🔄 バックアップから復元</button>
+    <button onclick="confirmReset()" style="background:none;border:none;color:var(--border);font-size:11px;cursor:pointer;">×</button>
   </div>
 </div>
 
 <!-- NAME SELECT -->
 <div id="name-select-screen" class="screen">
-  <div id="name-select-inner" style="max-width:500px;margin:0 auto;padding:0 20px 40px;">
+  <div style="max-width:500px;margin:0 auto;padding:0 20px 40px;">
     <div class="name-select-header">
       <h1>自分の名前を選択</h1>
       <p>次回から自動でスキップされます</p>
@@ -212,7 +231,7 @@
   <div class="app-header">
     <div class="title">2026年DM合宿投資計画</div>
   </div>
-  <div class="home-body">
+  <div style="max-width:500px;margin:0 auto;" class="home-body">
     <div class="home-welcome">
       <div class="home-avatar-lg" id="home-avatar"></div>
       <div class="home-name-label" id="home-name"></div>
@@ -234,7 +253,7 @@
       </span>
     </button>
     <div class="home-secondary">
-      <button onclick="showResults()">📊 集計・意見を確認する</button>
+      <button onclick="showResults()">📋 意見・質問を確認する</button>
       <button onclick="showAdmin()">⚙ 設定を編集</button>
     </div>
   </div>
@@ -282,27 +301,33 @@
   </div>
 </div>
 
-<!-- RESULTS -->
+<!-- RESULTS (意見・質問一覧) -->
 <div id="results-screen" class="screen">
   <div class="app-header">
     <button class="back-btn" onclick="goHome()">←</button>
-    <div class="title">集計・記録</div>
+    <div class="title">意見・質問 一覧</div>
+    <button class="back-btn" style="margin-left:auto;font-size:18px;" onclick="fetchAndRenderComments()">↻</button>
   </div>
-  <div class="result-tabs">
-    <button class="result-tab active" id="tab-btn-votes" onclick="switchResultTab('votes')">🗳️ 投票結果</button>
-    <button class="result-tab" id="tab-btn-comments" onclick="switchResultTab('comments')">💬 意見・質問</button>
+  <div class="refresh-bar">
+    <span id="last-updated-comments">最終更新: —</span>
+    <button onclick="fetchAndRenderComments()">今すぐ更新</button>
   </div>
-  <div id="tab-votes">
-    <div class="results-summary" id="results-summary"></div>
-    <div class="results-grid" id="results-grid"></div>
+  <div class="comments-pane" id="comments-pane"></div>
+</div>
+
+<!-- VOTE RESULTS (管理者用) -->
+<div id="vote-results-screen" class="screen">
+  <div class="app-header">
+    <button class="back-btn" onclick="showAdmin()">←</button>
+    <div class="title">投票集計</div>
+    <button class="back-btn" style="margin-left:auto;font-size:18px;" onclick="fetchAndRenderVotes()">↻</button>
   </div>
-  <div id="tab-comments" style="display:none;">
-    <div class="comments-pane" id="comments-pane"></div>
+  <div class="refresh-bar">
+    <span id="last-updated-votes">最終更新: —</span>
+    <button onclick="fetchAndRenderVotes()">今すぐ更新</button>
   </div>
-  <div class="results-footer">
-    <button class="footer-btn footer-btn-csv" onclick="exportResults()">CSV出力</button>
-    <button class="footer-btn footer-btn-reset" onclick="confirmReset()">リセット</button>
-  </div>
+  <div class="results-summary" id="results-summary"></div>
+  <div class="results-grid" id="results-grid"></div>
 </div>
 
 <!-- MODAL: Submit -->
@@ -329,6 +354,18 @@
   </div>
 </div>
 
+<!-- MODAL: Backup -->
+<div class="modal-overlay" id="backup-modal">
+  <div class="modal" style="max-width:420px;">
+    <h3>バックアップから復元</h3>
+    <p style="margin-bottom:14px;font-size:13px;color:var(--muted);">この端末に自動保存された履歴から復元できます（最新5件）。</p>
+    <div id="backup-list" style="display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;"></div>
+    <div class="modal-btns" style="margin-top:16px;">
+      <button class="modal-cancel" onclick="closeModal('backup-modal')">閉じる</button>
+    </div>
+  </div>
+</div>
+
 <!-- 投票完了 -->
 <div class="toast-popup" id="vote-done-popup">
   <div class="toast-box">
@@ -350,124 +387,167 @@
   </div>
 </div>
 
+<!-- LOADING -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+  <p id="loading-text">読み込み中...</p>
+</div>
+
 <script>
+// ===== 設定 =====
 const NAMES = ['中濱','黒井','伊藤','三村','青山','武居','松村','平本','松下'];
 const DEFAULT_PLANS = NAMES.map(n => n + 'さんの投資計画');
+const BUDGET = 1000;
+const THRESHOLD = 3000;
+
+// GASのURLはlocalStorageに保存（各端末で設定）
+let GAS_URL = localStorage.getItem('gasUrl') || '';
 
 const STATE = {
   plans: [], members: [], votes: {}, comments: [],
   currentVoter: null, selectedPlanId: null,
-  BUDGET: 1000, THRESHOLD: 3000,
 };
 
-// XSS防止のためのエスケープ
-function esc(str) {
-  return String(str)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;')
-    .replace(/'/g,'&#039;');
-}
-
-window.addEventListener('load', () => {
+// ===== 初期化 =====
+window.addEventListener('load', async () => {
   buildAdminInputs();
-  loadFromStorage();
+
+  if (!GAS_URL) {
+    document.getElementById('setup-banner').style.display = 'block';
+    showScreen('admin-screen');
+    return;
+  }
+
+  showLoading('データを読み込み中...');
+  try {
+    const data = await gasGet('getData');
+    applyServerData(data);
+    hideLoading();
+
+    const savedVoter = localStorage.getItem('currentVoter');
+    if (data.plans && data.plans.length > 0) {
+      if (savedVoter && data.members && data.members.includes(savedVoter)) {
+        STATE.currentVoter = savedVoter;
+        showHome();
+      } else {
+        showNameSelect();
+      }
+    } else {
+      showScreen('admin-screen');
+    }
+  } catch(e) {
+    hideLoading();
+    alert('サーバーへの接続に失敗しました。GASのURLを確認してください。\n' + e.message);
+    showScreen('admin-screen');
+  }
 });
 
+function applyServerData(data) {
+  if (!data) return;
+  STATE.plans    = data.plans    || [];
+  STATE.members  = data.members  || [];
+  STATE.votes    = data.votes    || {};
+  STATE.comments = data.comments || [];
+  saveBackup(data);
+}
+
+// ===== GAS API =====
+async function gasGet(action, params = {}) {
+  const url = new URL(GAS_URL);
+  url.searchParams.set('action', action);
+  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, typeof v === 'string' ? v : JSON.stringify(v)));
+  const res = await fetch(url.toString(), { redirect: 'follow' });
+  const json = await res.json();
+  if (!json.ok) throw new Error(json.error || 'API error');
+  return json.data;
+}
+
+async function gasPost(action, params = {}) {
+  const body = new URLSearchParams({ action });
+  Object.entries(params).forEach(([k, v]) => body.set(k, typeof v === 'string' ? v : JSON.stringify(v)));
+  const res = await fetch(GAS_URL, { method: 'POST', body, redirect: 'follow' });
+  const json = await res.json();
+  if (!json.ok) throw new Error(json.error || 'API error');
+  return json.data;
+}
+
+// ===== GAS URL 設定 =====
+function saveGasUrl() {
+  const val = document.getElementById('gas-url-input').value.trim();
+  if (!val.startsWith('https://script.google.com/macros/')) {
+    alert('GASのウェブアプリURLを正しく入力してください');
+    return;
+  }
+  GAS_URL = val;
+  localStorage.setItem('gasUrl', val);
+  document.getElementById('setup-banner').style.display = 'none';
+  location.reload();
+}
+
+// ===== ADMIN =====
 function buildAdminInputs() {
   const container = document.getElementById('plan-inputs');
   container.innerHTML = '';
   NAMES.forEach((name, i) => {
     const row = document.createElement('div');
     row.className = 'plan-row';
-    row.innerHTML = `
-      <input type="text" value="${esc(name)}" class="plan-proposer-input">
-      <input type="text" value="${esc(DEFAULT_PLANS[i])}" class="plan-name-input" oninput="autoSaveAdmin()">
-    `;
+    const propInput = document.createElement('input');
+    propInput.type = 'text';
+    propInput.value = name;
+    propInput.className = 'plan-proposer-input';
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.value = DEFAULT_PLANS[i];
+    nameInput.className = 'plan-name-input';
+    nameInput.oninput = autoSaveAdmin;
+    row.appendChild(propInput); row.appendChild(nameInput);
     container.appendChild(row);
   });
-}
-
-function loadFromStorage() {
-  const raw = localStorage.getItem('investmentVote2026');
-  if (!raw) return;
-  try {
-    const data = JSON.parse(raw);
-    // 事業名の復元
-    if (data.adminData) {
+  // ローカルに保存されている事業名を復元
+  const saved = localStorage.getItem('adminData');
+  if (saved) {
+    try {
+      const d = JSON.parse(saved);
       const nameInputs = document.querySelectorAll('.plan-name-input');
-      data.adminData.forEach((d, i) => {
-        if (nameInputs[i] && d.name) nameInputs[i].value = d.name;
-      });
-    }
-    if (data.plans && data.plans.length > 0) {
-      STATE.plans    = data.plans;
-      STATE.members  = data.members || [];
-      STATE.votes    = data.votes   || {};
-      STATE.comments = data.comments || [];
-      if (data.currentVoter && STATE.members.includes(data.currentVoter)) {
-        STATE.currentVoter = data.currentVoter;
-        showHome();
-      } else {
-        showNameSelect();
-      }
-    }
-  } catch(e) { console.error('load error', e); }
-}
-
-function saveToStorage() {
-  const raw  = localStorage.getItem('investmentVote2026');
-  const prev = raw ? JSON.parse(raw) : {};
-  localStorage.setItem('investmentVote2026', JSON.stringify({
-    ...prev,
-    plans: STATE.plans, members: STATE.members,
-    votes: STATE.votes, comments: STATE.comments,
-    currentVoter: STATE.currentVoter,
-  }));
+      d.forEach((item, i) => { if (nameInputs[i] && item.name) nameInputs[i].value = item.name; });
+    } catch(e) {}
+  }
 }
 
 function autoSaveAdmin() {
   const data = getAdminInputData();
-  const raw  = localStorage.getItem('investmentVote2026');
-  const prev = raw ? JSON.parse(raw) : {};
-  localStorage.setItem('investmentVote2026', JSON.stringify({ ...prev, adminData: data }));
+  localStorage.setItem('adminData', JSON.stringify(data));
 }
 
 function getAdminInputData() {
   const props = document.querySelectorAll('.plan-proposer-input');
   const names = document.querySelectorAll('.plan-name-input');
-  return Array.from(props).map((p, i) => ({
-    proposer: p.value.trim(), name: names[i].value.trim()
-  }));
+  return Array.from(props).map((p, i) => ({ proposer: p.value.trim(), name: names[i].value.trim() }));
 }
 
-function startSession() {
-  const data = getAdminInputData();
-  STATE.plans = []; STATE.members = [];
-  data.forEach((d, i) => {
-    if (d.proposer && d.name) {
-      STATE.plans.push({ id: `plan_${i}`, proposer: d.proposer, name: d.name });
-      STATE.members.push(d.proposer);
-    }
-  });
-  if (!STATE.plans.length) { alert('氏名と事業名を1件以上入力してください'); return; }
-  STATE.votes    = {};
-  STATE.comments = [];
-  STATE.currentVoter = null;
-  saveToStorage();
-  showNameSelect();
+async function startSession() {
+  if (!GAS_URL) { alert('GASのURLを設定してください'); return; }
+  const rows = getAdminInputData().filter(r => r.proposer && r.name);
+  if (!rows.length) { alert('氏名と事業名を1件以上入力してください'); return; }
+
+  const plans   = rows.map((r, i) => ({ id: `plan_${i}`, proposer: r.proposer, name: r.name }));
+  const members = rows.map(r => r.proposer);
+
+  showLoading('セッションを開始中...');
+  try {
+    const data = await gasPost('startSession', { plans, members });
+    applyServerData(data);
+    hideLoading();
+    localStorage.setItem('currentVoter', '');
+    showNameSelect();
+  } catch(e) {
+    hideLoading();
+    alert('エラー: ' + e.message);
+  }
 }
 
 function showAdmin() {
-  const raw = localStorage.getItem('investmentVote2026');
-  if (raw) {
-    const data = JSON.parse(raw);
-    if (data.adminData) {
-      const nameInputs = document.querySelectorAll('.plan-name-input');
-      data.adminData.forEach((d, i) => { if (nameInputs[i] && d.name) nameInputs[i].value = d.name; });
-    }
-  }
+  buildAdminInputs();
   showScreen('admin-screen');
 }
 
@@ -484,8 +564,7 @@ function showNameSelect() {
     avatar.textContent = name.charAt(0);
     const label = document.createElement('span');
     label.textContent = name;
-    btn.appendChild(avatar);
-    btn.appendChild(label);
+    btn.appendChild(avatar); btn.appendChild(label);
     btn.onclick = () => selectName(name);
     grid.appendChild(btn);
   });
@@ -493,7 +572,7 @@ function showNameSelect() {
 
 function selectName(name) {
   STATE.currentVoter = name;
-  saveToStorage();
+  localStorage.setItem('currentVoter', name);
   showHome();
 }
 
@@ -517,23 +596,25 @@ function goComment() {
   document.getElementById('comment-voter-label').textContent = STATE.currentVoter;
   document.getElementById('comment-textarea').value = '';
 
-  // チップを生成（提案者名のみ表示してコンパクトに）
   const chipsEl = document.getElementById('comment-plan-chips');
   chipsEl.innerHTML = '';
   STATE.plans.forEach(plan => {
     const chip = document.createElement('button');
     chip.className = 'plan-chip';
     chip.id = `chip_${plan.id}`;
-    // 提案者名と事業名（短縮）を表示
-    const shortName = plan.name.length > 10 ? plan.name.slice(0,10) + '…' : plan.name;
-    chip.innerHTML = `${esc(plan.proposer)}<span class="chip-sub">${esc(shortName)}</span>`;
+    const shortName = plan.name.length > 10 ? plan.name.slice(0, 10) + '…' : plan.name;
+    const propEl = document.createElement('span');
+    propEl.textContent = plan.proposer;
+    const subEl = document.createElement('span');
+    subEl.className = 'chip-sub';
+    subEl.textContent = shortName;
+    chip.appendChild(propEl); chip.appendChild(subEl);
     chip.onclick = () => selectCommentPlan(plan.id);
     chipsEl.appendChild(chip);
   });
 
   updateCommentSendBtn();
   showScreen('comment-screen');
-  // キーボードを開く
   setTimeout(() => document.getElementById('comment-textarea').focus(), 100);
 }
 
@@ -554,42 +635,54 @@ document.addEventListener('input', e => {
   if (e.target.id === 'comment-textarea') updateCommentSendBtn();
 });
 
-function submitComment() {
+async function submitComment() {
   const text = document.getElementById('comment-textarea').value.trim();
   if (!text || !STATE.selectedPlanId) return;
   const plan = STATE.plans.find(p => p.id === STATE.selectedPlanId);
   const now = new Date();
-  const timeStr = `${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
-  STATE.comments.push({
-    id: Date.now(), voter: STATE.currentVoter,
-    planId: STATE.selectedPlanId, planName: plan.name,
-    text, time: timeStr, timestamp: now.getTime(),
-  });
-  saveToStorage();
+  const comment = {
+    id: Date.now(),
+    voter: STATE.currentVoter,
+    planId: STATE.selectedPlanId,
+    planName: plan.name,
+    text,
+    date: `${now.getMonth()+1}/${now.getDate()}`,
+    time: `${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`,
+    timestamp: now.getTime(),
+  };
 
-  const doneText = document.getElementById('comment-done-text');
-  doneText.textContent = `「${plan.name}」の意見を記録しました`;
-  document.getElementById('comment-done-popup').classList.add('open');
+  document.getElementById('comment-send-btn').disabled = true;
+  showLoading('記録中...');
+  try {
+    const data = await gasPost('submitComment', { comment });
+    applyServerData(data);
+    hideLoading();
+    document.getElementById('comment-done-text').textContent = `「${plan.name}」の意見を記録しました`;
+    document.getElementById('comment-done-popup').classList.add('open');
+  } catch(e) {
+    hideLoading();
+    alert('記録に失敗しました: ' + e.message);
+    document.getElementById('comment-send-btn').disabled = false;
+  }
 }
 
 function closeCommentDoneContinue() {
   document.getElementById('comment-done-popup').classList.remove('open');
   document.getElementById('comment-textarea').value = '';
+  STATE.selectedPlanId = null;
+  document.querySelectorAll('.plan-chip').forEach(el => el.classList.remove('selected'));
   updateCommentSendBtn();
 }
 
 function closeCommentDoneHome() {
   document.getElementById('comment-done-popup').classList.remove('open');
-  document.getElementById('comment-textarea').value = '';
-  STATE.selectedPlanId = null;
   goHome();
 }
 
 // ===== VOTING =====
-function goVote() { startVoting(STATE.currentVoter); }
-
-function startVoting(voterName) {
-  document.getElementById('voter-info-label').textContent = voterName;
+function goVote() {
+  document.getElementById('voter-info-label').textContent = STATE.currentVoter;
+  const voterName = STATE.currentVoter;
   if (!STATE.votes[voterName]) STATE.votes[voterName] = {};
   STATE.plans.forEach(p => {
     if (STATE.votes[voterName][p.id] === undefined) STATE.votes[voterName][p.id] = 0;
@@ -605,42 +698,22 @@ function startVoting(voterName) {
     card.className = `plan-card${amount > 0 ? ' has-vote' : ''}${isOwn ? ' own-plan' : ''}`;
     card.id = `card_${plan.id}`;
 
-    const nameEl = document.createElement('div');
-    nameEl.className = 'plan-name';
-    nameEl.textContent = plan.name;
-    const propEl = document.createElement('div');
-    propEl.className = 'plan-proposer';
-    propEl.textContent = plan.proposer;
-    card.appendChild(nameEl);
-    card.appendChild(propEl);
+    const nameEl = document.createElement('div'); nameEl.className = 'plan-name'; nameEl.textContent = plan.name;
+    const propEl = document.createElement('div'); propEl.className = 'plan-proposer'; propEl.textContent = plan.proposer;
+    card.appendChild(nameEl); card.appendChild(propEl);
 
     if (isOwn) {
-      const notice = document.createElement('div');
-      notice.className = 'own-plan-notice';
-      notice.textContent = '投票できません';
+      const notice = document.createElement('div'); notice.className = 'own-plan-notice'; notice.textContent = '投票できません';
       card.appendChild(notice);
     } else {
-      const ctrl = document.createElement('div');
-      ctrl.className = 'vote-control';
-
-      const minusBtn = document.createElement('button');
-      minusBtn.className = 'vote-btn';
-      minusBtn.textContent = '−';
+      const ctrl = document.createElement('div'); ctrl.className = 'vote-control';
+      const minusBtn = document.createElement('button'); minusBtn.className = 'vote-btn'; minusBtn.textContent = '−';
       minusBtn.onclick = () => adjustVote(plan.id, -50);
-
-      const amountEl = document.createElement('div');
-      amountEl.className = 'vote-amount';
-      amountEl.id = `amount_${plan.id}`;
+      const amountEl = document.createElement('div'); amountEl.className = 'vote-amount'; amountEl.id = `amount_${plan.id}`;
       amountEl.innerHTML = `${amount}<span class="unit">万円</span>`;
-
-      const plusBtn = document.createElement('button');
-      plusBtn.className = 'vote-btn';
-      plusBtn.textContent = '＋';
+      const plusBtn = document.createElement('button'); plusBtn.className = 'vote-btn'; plusBtn.textContent = '＋';
       plusBtn.onclick = () => adjustVote(plan.id, 50);
-
-      ctrl.appendChild(minusBtn);
-      ctrl.appendChild(amountEl);
-      ctrl.appendChild(plusBtn);
+      ctrl.appendChild(minusBtn); ctrl.appendChild(amountEl); ctrl.appendChild(plusBtn);
       card.appendChild(ctrl);
     }
     container.appendChild(card);
@@ -651,56 +724,64 @@ function startVoting(voterName) {
 }
 
 function getTotalAllocated() {
-  const votes = STATE.votes[STATE.currentVoter] || {};
-  return Object.values(votes).reduce((a,b) => a+b, 0);
+  return Object.values(STATE.votes[STATE.currentVoter] || {}).reduce((a, b) => a + b, 0);
 }
 
 function adjustVote(planId, delta) {
   const votes = STATE.votes[STATE.currentVoter];
   const current = votes[planId] || 0;
-  const remaining = STATE.BUDGET - getTotalAllocated();
+  const remaining = BUDGET - getTotalAllocated();
   let next = current + delta;
   if (next < 0) next = 0;
   if (delta > 0 && remaining < delta) next = current;
   votes[planId] = next;
   const amountEl = document.getElementById(`amount_${planId}`);
   if (amountEl) amountEl.innerHTML = `${next}<span class="unit">万円</span>`;
-  const card = document.getElementById(`card_${planId}`);
-  if (card) card.classList.toggle('has-vote', next > 0);
+  document.getElementById(`card_${planId}`)?.classList.toggle('has-vote', next > 0);
   updateBudgetDisplay();
 }
 
 function updateBudgetDisplay() {
   const total = getTotalAllocated();
-  const remaining = STATE.BUDGET - total;
+  const remaining = BUDGET - total;
   const display = document.getElementById('remaining-display');
   const fill = document.getElementById('budget-fill');
   display.textContent = remaining.toLocaleString();
-  if (remaining > 300) { display.className = 'budget-number ok'; fill.style.background = 'var(--pass)'; }
-  else if (remaining > 0) { display.className = 'budget-number warn'; fill.style.background = 'var(--accent2)'; }
-  else { display.className = 'budget-number over'; fill.style.background = '#e05555'; }
-  fill.style.width = `${100 - (total / STATE.BUDGET * 100)}%`;
+  if (remaining > 300)      { display.className = 'budget-number ok';   fill.style.background = 'var(--pass)'; }
+  else if (remaining > 0)   { display.className = 'budget-number warn'; fill.style.background = 'var(--accent2)'; }
+  else                      { display.className = 'budget-number over'; fill.style.background = '#e05555'; }
+  fill.style.width = `${Math.max(0, remaining / BUDGET * 100)}%`;
   const btn = document.getElementById('submit-btn');
   const summary = document.getElementById('submit-summary');
-  if (total === 0) { btn.disabled = true; summary.textContent = '1万円以上配分してから確定してください'; }
-  else if (remaining < 0) { btn.disabled = true; summary.textContent = `予算オーバー（${Math.abs(remaining)}万円超過）`; }
-  else { btn.disabled = false; summary.textContent = `投資合計：${total}万円 ／ 残り：${remaining}万円`; }
+  if (total === 0)        { btn.disabled = true;  summary.textContent = '1万円以上配分してから確定してください'; }
+  else if (remaining < 0) { btn.disabled = true;  summary.textContent = `予算オーバー（${Math.abs(remaining)}万円超過）`; }
+  else                    { btn.disabled = false; summary.textContent = `投資合計：${total}万円 ／ 残り：${remaining}万円`; }
 }
 
 function confirmSubmit() {
   const votes = STATE.votes[STATE.currentVoter] || {};
-  const lines = STATE.plans.filter(p => (votes[p.id]||0) > 0).map(p => `・${p.name}：${votes[p.id]}万円`);
+  const lines = STATE.plans.filter(p => (votes[p.id] || 0) > 0).map(p => `・${p.name}：${votes[p.id]}万円`);
   if (!lines.length) return;
   document.getElementById('submit-modal-text').textContent = `${lines.join('\n')}\n\n合計：${getTotalAllocated()}万円`;
   openModal('submit-modal');
 }
 
-function submitVote() {
+async function submitVote() {
   closeModal('submit-modal');
-  saveToStorage();
-  const el = document.getElementById('vote-done-text');
-  el.textContent = `${STATE.currentVoter} さんの投票を記録しました`;
-  document.getElementById('vote-done-popup').classList.add('open');
+  showLoading('投票を送信中...');
+  try {
+    const data = await gasPost('submitVote', {
+      voter: STATE.currentVoter,
+      votes: STATE.votes[STATE.currentVoter],
+    });
+    applyServerData(data);
+    hideLoading();
+    document.getElementById('vote-done-text').textContent = `${STATE.currentVoter} さんの投票を記録しました`;
+    document.getElementById('vote-done-popup').classList.add('open');
+  } catch(e) {
+    hideLoading();
+    alert('投票の送信に失敗しました: ' + e.message);
+  }
 }
 
 function closeVoteDone() {
@@ -708,100 +789,27 @@ function closeVoteDone() {
   goHome();
 }
 
-// ===== RESULTS =====
-function showResults() {
+// ===== RESULTS (意見・質問) =====
+let resultsRefreshTimer = null;
+
+async function showResults() {
   showScreen('results-screen');
-  switchResultTab('votes');
+  await fetchAndRenderComments();
+  // 30秒ごとに自動更新
+  clearInterval(resultsRefreshTimer);
+  resultsRefreshTimer = setInterval(fetchAndRenderComments, 30000);
 }
 
-function switchResultTab(tab) {
-  document.getElementById('tab-btn-votes').classList.toggle('active', tab === 'votes');
-  document.getElementById('tab-btn-comments').classList.toggle('active', tab === 'comments');
-  document.getElementById('tab-votes').style.display    = tab === 'votes' ? 'block' : 'none';
-  document.getElementById('tab-comments').style.display = tab === 'comments' ? 'block' : 'none';
-  if (tab === 'votes') renderVotes();
-  else renderComments();
-}
-
-function renderVotes() {
-  const votedCount = Object.keys(STATE.votes).filter(k => Object.values(STATE.votes[k]).some(v => v > 0)).length;
-  const summary = document.getElementById('results-summary');
-  summary.innerHTML = '';
-  [
-    { val: votedCount, label: '投票済み', color: 'var(--accent)' },
-    { val: STATE.members.length - votedCount, label: '未投票', color: 'var(--muted)' },
-    { val: STATE.members.length, label: '参加者', color: 'var(--gold)' },
-    { val: STATE.THRESHOLD.toLocaleString() + '万円', label: '通過ライン', color: 'var(--pass)' },
-  ].forEach(s => {
-    const box = document.createElement('div');
-    box.className = 'stat-box';
-    const val = document.createElement('div');
-    val.className = 'stat-value';
-    val.style.color = s.color;
-    val.textContent = s.val;
-    const lbl = document.createElement('div');
-    lbl.className = 'stat-label';
-    lbl.textContent = s.label;
-    box.appendChild(val); box.appendChild(lbl);
-    summary.appendChild(box);
-  });
-
-  const planTotals = STATE.plans.map(plan => {
-    let total = 0;
-    const breakdown = STATE.members.map(member => {
-      const amt = (STATE.votes[member]||{})[plan.id]||0;
-      total += amt;
-      return { member, amt };
-    });
-    return { ...plan, total, breakdown };
-  }).sort((a,b) => b.total - a.total);
-
-  const maxTotal = Math.max(...planTotals.map(p => p.total), STATE.THRESHOLD);
-  const grid = document.getElementById('results-grid');
-  grid.innerHTML = '';
-
-  planTotals.forEach((plan, idx) => {
-    const passed = plan.total >= STATE.THRESHOLD;
-    const card = document.createElement('div');
-    card.className = `result-card ${passed ? 'passed' : 'failed'}`;
-    card.style.animationDelay = `${idx * 0.08}s`;
-
-    const barPct = maxTotal > 0 ? (plan.total / maxTotal) * 100 : 0;
-
-    // テキストノードで安全に設定
-    const nameEl = document.createElement('div'); nameEl.className = 'result-plan-name'; nameEl.textContent = plan.name;
-    const propEl = document.createElement('div'); propEl.className = 'result-proposer'; propEl.textContent = `提案者：${plan.proposer}`;
-    const totalEl = document.createElement('div'); totalEl.className = `result-total ${passed ? 'pass-color' : 'fail-color'}`;
-    totalEl.textContent = plan.total.toLocaleString();
-    const unitSpan = document.createElement('span'); unitSpan.style.cssText = 'font-size:13px;color:var(--muted);font-weight:400'; unitSpan.textContent = '万円';
-    totalEl.appendChild(unitSpan);
-
-    const threshEl = document.createElement('div'); threshEl.style.cssText = 'font-size:12px;color:var(--muted);margin-bottom:8px;';
-    threshEl.textContent = `通過ライン：${STATE.THRESHOLD.toLocaleString()}万円${passed ? ' ✅ 通過' : ` （あと${(STATE.THRESHOLD-plan.total).toLocaleString()}万円）`}`;
-
-    const barWrap = document.createElement('div'); barWrap.className = 'result-bar-wrap';
-    const bar = document.createElement('div'); bar.className = 'result-bar';
-    bar.style.cssText = `width:${barPct}%;background:${passed?'var(--pass)':'var(--muted)'}`;
-    barWrap.appendChild(bar);
-
-    const bdDiv = document.createElement('div'); bdDiv.className = 'voter-breakdown';
-    plan.breakdown.forEach(b => {
-      const row = document.createElement('div'); row.className = 'voter-row';
-      const bPct = STATE.BUDGET > 0 ? (b.amt / STATE.BUDGET) * 100 : 0;
-      const nameCol = document.createElement('div'); nameCol.className = 'voter-name-col'; nameCol.textContent = b.member;
-      const bw = document.createElement('div'); bw.className = 'voter-bar-wrap';
-      const bb = document.createElement('div'); bb.className = 'voter-bar';
-      bb.style.cssText = `width:${bPct}%;background:${b.amt>0?'var(--accent)':'transparent'}`;
-      bw.appendChild(bb);
-      const vv = document.createElement('div'); vv.className = 'voter-vote'; vv.textContent = b.amt > 0 ? b.amt+'万円' : '—';
-      row.appendChild(nameCol); row.appendChild(bw); row.appendChild(vv);
-      bdDiv.appendChild(row);
-    });
-
-    card.appendChild(nameEl); card.appendChild(propEl); card.appendChild(totalEl);
-    card.appendChild(threshEl); card.appendChild(barWrap); card.appendChild(bdDiv);
-    grid.appendChild(card);
-  });
+async function fetchAndRenderComments() {
+  try {
+    const data = await gasGet('getData');
+    applyServerData(data);
+    document.getElementById('last-updated-comments').textContent =
+      '最終更新: ' + new Date().toLocaleTimeString('ja-JP');
+    renderComments();
+  } catch(e) {
+    console.error('更新失敗', e);
+  }
 }
 
 function renderComments() {
@@ -816,47 +824,34 @@ function renderComments() {
     return;
   }
 
-  // 全件ヘッダー
+  // 全件（時系列）
   const hdr = document.createElement('div');
   hdr.style.cssText = 'font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;';
   hdr.textContent = `すべての意見・質問（${STATE.comments.length}件）`;
   pane.appendChild(hdr);
 
-  // 全件リスト（時系列）
-  [...STATE.comments].sort((a,b) => (a.timestamp||0) - (b.timestamp||0)).forEach(c => {
+  [...STATE.comments].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0)).forEach(c => {
     try {
+      const voter = c.voter || '?';
+      const dateTime = [c.date, c.time].filter(Boolean).join(' ');
       const card = document.createElement('div');
       card.className = 'all-comment-card';
 
-      const headerRow = document.createElement('div');
-      headerRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:6px;';
+      const row1 = document.createElement('div');
+      row1.style.cssText = 'display:flex;align-items:center;gap:7px;margin-bottom:6px;flex-wrap:wrap;';
 
-      const voter = c.voter || c.name || '?';
-      const avatar = document.createElement('div');
-      avatar.className = 'comment-avatar';
-      avatar.textContent = voter.charAt(0);
+      const avatar = document.createElement('div'); avatar.className = 'comment-avatar'; avatar.textContent = voter.charAt(0);
+      const who = document.createElement('div'); who.style.cssText = 'font-size:13px;font-weight:700;'; who.textContent = voter;
+      const tag = document.createElement('div'); tag.className = 'comment-plan-tag'; tag.textContent = c.planName || '';
+      const when = document.createElement('div'); when.style.cssText = 'font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;'; when.textContent = dateTime;
 
-      const who = document.createElement('div');
-      who.style.cssText = 'font-size:13px;font-weight:700;';
-      who.textContent = voter;
+      row1.appendChild(avatar); row1.appendChild(who); row1.appendChild(tag); row1.appendChild(when);
 
-      const when = document.createElement('div');
-      when.style.cssText = 'font-size:11px;color:var(--muted);margin-left:auto;';
-      when.textContent = c.time || '';
+      const text = document.createElement('div'); text.className = 'comment-text-content'; text.textContent = c.text || '';
 
-      headerRow.appendChild(avatar); headerRow.appendChild(who); headerRow.appendChild(when);
-
-      const tag = document.createElement('div');
-      tag.className = 'comment-plan-tag';
-      tag.textContent = c.planName || '';
-
-      const text = document.createElement('div');
-      text.className = 'comment-text-content';
-      text.textContent = c.text || '';
-
-      card.appendChild(headerRow); card.appendChild(tag); card.appendChild(text);
+      card.appendChild(row1); card.appendChild(text);
       pane.appendChild(card);
-    } catch(e) { console.error('comment render error', e, c); }
+    } catch(e) { console.error('render error', e); }
   });
 
   // 提案別
@@ -869,28 +864,31 @@ function renderComments() {
     const cs = STATE.comments.filter(c => c.planId === p.id);
     if (!cs.length) return;
 
-    const group = document.createElement('div');
-    group.className = 'comment-plan-group';
+    const group = document.createElement('div'); group.className = 'comment-plan-group';
 
-    const titleEl = document.createElement('div');
-    titleEl.className = 'comment-plan-title';
-    const titleText = document.createElement('span');
-    titleText.textContent = p.name;
-    const badge = document.createElement('span');
-    badge.className = 'comment-count-badge';
-    badge.textContent = `${cs.length}件`;
-    titleEl.appendChild(titleText); titleEl.appendChild(badge);
+    const titleEl = document.createElement('div'); titleEl.className = 'comment-plan-title';
+    const titleText = document.createElement('span'); titleText.textContent = p.name;
+    const right = document.createElement('div'); right.style.cssText = 'display:flex;align-items:center;gap:8px;';
+    const badge = document.createElement('span'); badge.className = 'comment-count-badge'; badge.textContent = `${cs.length}件`;
+    const copyBtn = document.createElement('button');
+    copyBtn.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:var(--accent);';
+    copyBtn.textContent = 'コピー';
+    copyBtn.onclick = () => {
+      const txt = cs.map(c => `[${c.voter||'?'} ${[c.date,c.time].filter(Boolean).join(' ')}]\n${c.text}`).join('\n\n');
+      navigator.clipboard.writeText(`【${p.name}】\n\n${txt}`).then(() => {
+        copyBtn.textContent = '✓ コピー済み';
+        setTimeout(() => { copyBtn.textContent = 'コピー'; }, 2000);
+      });
+    };
+    right.appendChild(badge); right.appendChild(copyBtn);
+    titleEl.appendChild(titleText); titleEl.appendChild(right);
     group.appendChild(titleEl);
 
     cs.forEach(c => {
-      const item = document.createElement('div');
-      item.className = 'comment-item';
-      const meta = document.createElement('div');
-      meta.className = 'comment-meta';
-      meta.textContent = `${c.voter} ・ ${c.time}`;
-      const txt = document.createElement('div');
-      txt.className = 'comment-text-content';
-      txt.textContent = c.text;
+      const item = document.createElement('div'); item.className = 'comment-item';
+      const meta = document.createElement('div'); meta.className = 'comment-meta';
+      meta.textContent = `${c.voter||'?'} ・ ${[c.date,c.time].filter(Boolean).join(' ')}`;
+      const txt = document.createElement('div'); txt.className = 'comment-text-content'; txt.textContent = c.text;
       item.appendChild(meta); item.appendChild(txt);
       group.appendChild(item);
     });
@@ -898,31 +896,197 @@ function renderComments() {
   });
 }
 
+// ===== VOTE RESULTS =====
+async function showVoteResults() {
+  showScreen('vote-results-screen');
+  await fetchAndRenderVotes();
+}
+
+async function fetchAndRenderVotes() {
+  try {
+    const data = await gasGet('getData');
+    applyServerData(data);
+    document.getElementById('last-updated-votes').textContent =
+      '最終更新: ' + new Date().toLocaleTimeString('ja-JP');
+    renderVotes();
+  } catch(e) { console.error('更新失敗', e); }
+}
+
+function renderVotes() {
+  const votedCount = Object.keys(STATE.votes).filter(k => Object.values(STATE.votes[k]).some(v => v > 0)).length;
+  const summary = document.getElementById('results-summary');
+  summary.innerHTML = '';
+  [
+    { val: votedCount, label: '投票済み', color: 'var(--accent)' },
+    { val: STATE.members.length - votedCount, label: '未投票', color: 'var(--muted)' },
+    { val: STATE.members.length, label: '参加者', color: 'var(--gold)' },
+    { val: THRESHOLD.toLocaleString() + '万円', label: '通過ライン', color: 'var(--pass)' },
+  ].forEach(s => {
+    const box = document.createElement('div'); box.className = 'stat-box';
+    const val = document.createElement('div'); val.className = 'stat-value'; val.style.color = s.color; val.textContent = s.val;
+    const lbl = document.createElement('div'); lbl.className = 'stat-label'; lbl.textContent = s.label;
+    box.appendChild(val); box.appendChild(lbl);
+    summary.appendChild(box);
+  });
+
+  const planTotals = STATE.plans.map(plan => {
+    let total = 0;
+    const breakdown = STATE.members.map(member => {
+      const amt = (STATE.votes[member] || {})[plan.id] || 0;
+      total += amt;
+      return { member, amt };
+    });
+    return { ...plan, total, breakdown };
+  }).sort((a, b) => b.total - a.total);
+
+  const maxTotal = Math.max(...planTotals.map(p => p.total), THRESHOLD);
+  const grid = document.getElementById('results-grid');
+  grid.innerHTML = '';
+
+  planTotals.forEach(plan => {
+    const passed = plan.total >= THRESHOLD;
+    const card = document.createElement('div');
+    card.className = `result-card ${passed ? 'passed' : 'failed'}`;
+
+    const nameEl = document.createElement('div'); nameEl.className = 'result-plan-name'; nameEl.textContent = plan.name;
+    const propEl = document.createElement('div'); propEl.className = 'result-proposer'; propEl.textContent = `提案者：${plan.proposer}`;
+    const totalEl = document.createElement('div'); totalEl.className = `result-total ${passed ? 'pass-color' : 'fail-color'}`;
+    totalEl.textContent = plan.total.toLocaleString();
+    const unitSpan = document.createElement('span'); unitSpan.style.cssText = 'font-size:13px;color:var(--muted);font-weight:400'; unitSpan.textContent = '万円';
+    totalEl.appendChild(unitSpan);
+
+    const threshEl = document.createElement('div'); threshEl.style.cssText = 'font-size:12px;color:var(--muted);margin-bottom:8px;';
+    threshEl.textContent = `通過ライン：${THRESHOLD.toLocaleString()}万円${passed ? ' ✅ 通過' : ` （あと${(THRESHOLD - plan.total).toLocaleString()}万円）`}`;
+
+    const barWrap = document.createElement('div'); barWrap.className = 'result-bar-wrap';
+    const bar = document.createElement('div'); bar.className = 'result-bar';
+    bar.style.cssText = `width:${maxTotal > 0 ? plan.total / maxTotal * 100 : 0}%;background:${passed ? 'var(--pass)' : 'var(--muted)'}`;
+    barWrap.appendChild(bar);
+
+    const bdDiv = document.createElement('div'); bdDiv.className = 'voter-breakdown';
+    plan.breakdown.forEach(b => {
+      const row = document.createElement('div'); row.className = 'voter-row';
+      const nameCol = document.createElement('div'); nameCol.className = 'voter-name-col'; nameCol.textContent = b.member;
+      const bw = document.createElement('div'); bw.className = 'voter-bar-wrap';
+      const bb = document.createElement('div'); bb.className = 'voter-bar';
+      bb.style.cssText = `width:${BUDGET > 0 ? b.amt / BUDGET * 100 : 0}%;background:${b.amt > 0 ? 'var(--accent)' : 'transparent'}`;
+      bw.appendChild(bb);
+      const vv = document.createElement('div'); vv.className = 'voter-vote'; vv.textContent = b.amt > 0 ? b.amt + '万円' : '—';
+      row.appendChild(nameCol); row.appendChild(bw); row.appendChild(vv);
+      bdDiv.appendChild(row);
+    });
+
+    card.appendChild(nameEl); card.appendChild(propEl); card.appendChild(totalEl);
+    card.appendChild(threshEl); card.appendChild(barWrap); card.appendChild(bdDiv);
+    grid.appendChild(card);
+  });
+}
+
 // ===== CSV =====
-function exportResults() {
+function exportCSV() {
   const rows = STATE.plans.map(plan => {
     let total = 0;
     const row = { plan: plan.name, proposer: plan.proposer };
-    STATE.members.forEach(m => { const a=(STATE.votes[m]||{})[plan.id]||0; total+=a; row[m]=a; });
-    row['合計']=total; row['通過']=total>=STATE.THRESHOLD?'YES':'NO';
+    STATE.members.forEach(m => { const a = (STATE.votes[m] || {})[plan.id] || 0; total += a; row[m] = a; });
+    row['合計'] = total; row['通過'] = total >= THRESHOLD ? 'YES' : 'NO';
     return row;
   });
-  const headers = ['事業名','提案者',...STATE.members,'合計（万円）','通過判定'];
-  const csv = [headers,...rows.map(r=>[r.plan,r.proposer,...STATE.members.map(m=>r[m]||0),r['合計'],r['通過']])].map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+  const headers = ['事業名', '提案者', ...STATE.members, '合計（万円）', '通過判定'];
+  const csv = [headers, ...rows.map(r => [r.plan, r.proposer, ...STATE.members.map(m => r[m] || 0), r['合計'], r['通過']])]
+    .map(r => r.map(v => `"${v}"`).join(',')).join('\n');
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'}));
-  a.download = '投資計画_投票結果.csv'; a.click();
+  a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' }));
+  a.download = '投資計画_投票結果.csv';
+  a.click();
 }
 
+// ===== BACKUP =====
+function saveBackup(data) {
+  try {
+    const bkRaw = localStorage.getItem('investmentVote2026_bk');
+    const bk = bkRaw ? JSON.parse(bkRaw) : { snapshots: [] };
+    bk.snapshots.unshift({ savedAt: new Date().toLocaleString('ja-JP'), data });
+    if (bk.snapshots.length > 5) bk.snapshots = bk.snapshots.slice(0, 5);
+    localStorage.setItem('investmentVote2026_bk', JSON.stringify(bk));
+  } catch(e) {}
+}
+
+function showBackups() {
+  const bkRaw = localStorage.getItem('investmentVote2026_bk');
+  const list = document.getElementById('backup-list');
+  list.innerHTML = '';
+  const bk = bkRaw ? JSON.parse(bkRaw) : null;
+  if (!bk || !bk.snapshots || !bk.snapshots.length) {
+    list.textContent = 'バックアップがまだありません';
+    openModal('backup-modal');
+    return;
+  }
+  bk.snapshots.forEach((snap, i) => {
+    const d = snap.data;
+    const voteCount = Object.keys(d.votes || {}).filter(k => Object.values(d.votes[k]).some(v => v > 0)).length;
+    const commentCount = (d.comments || []).length;
+    const row = document.createElement('div');
+    row.style.cssText = 'background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;';
+    const info = document.createElement('div');
+    const time = document.createElement('div'); time.style.cssText = 'font-size:13px;font-weight:700;'; time.textContent = snap.savedAt;
+    const stats = document.createElement('div'); stats.style.cssText = 'font-size:11px;color:var(--muted);margin-top:2px;';
+    stats.textContent = `投票${voteCount}件 ／ コメント${commentCount}件`;
+    info.appendChild(time); info.appendChild(stats);
+    const btn = document.createElement('button');
+    btn.style.cssText = 'background:var(--accent);color:white;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;';
+    btn.textContent = i === 0 ? '最新に戻す' : '復元';
+    btn.onclick = async () => {
+      if (!confirm(`${snap.savedAt} のデータに復元しますか？`)) return;
+      closeModal('backup-modal');
+      showLoading('復元中...');
+      try {
+        // GASにも復元データを書き戻す
+        await gasPost('startSession', { plans: d.plans, members: d.members });
+        for (const [voter, votes] of Object.entries(d.votes || {})) {
+          await gasPost('submitVote', { voter, votes });
+        }
+        for (const comment of (d.comments || [])) {
+          await gasPost('submitComment', { comment });
+        }
+        const newData = await gasGet('getData');
+        applyServerData(newData);
+        hideLoading();
+        alert('復元完了しました');
+      } catch(e) { hideLoading(); alert('復元失敗: ' + e.message); }
+    };
+    row.appendChild(info); row.appendChild(btn);
+    list.appendChild(row);
+  });
+  openModal('backup-modal');
+}
+
+// ===== RESET =====
+function confirmReset() { openModal('reset-modal'); }
+async function resetAll() {
+  closeModal('reset-modal');
+  showLoading('リセット中...');
+  try {
+    const data = await gasPost('reset');
+    applyServerData(data);
+    hideLoading();
+    showAdmin();
+  } catch(e) { hideLoading(); alert('リセット失敗: ' + e.message); }
+}
+
+// ===== UTILS =====
 function showScreen(id) {
+  clearInterval(resultsRefreshTimer);
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  window.scrollTo(0,0);
+  window.scrollTo(0, 0);
 }
-function openModal(id) { document.getElementById(id).classList.add('open'); }
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-function confirmReset() { openModal('reset-modal'); }
-function resetAll() { closeModal('reset-modal'); localStorage.removeItem('investmentVote2026'); location.reload(); }
+function showLoading(msg) {
+  document.getElementById('loading-text').textContent = msg || '処理中...';
+  document.getElementById('loading-overlay').classList.add('open');
+}
+function hideLoading() { document.getElementById('loading-overlay').classList.remove('open'); }
 </script>
 </body>
 </html>
