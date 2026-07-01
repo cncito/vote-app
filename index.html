@@ -113,7 +113,7 @@
   .submit-btn { background: var(--accent); color: white; border: none; border-radius: 10px; padding: 15px; font-size: 16px; font-weight: 700; cursor: pointer; width: 100%; }
   .submit-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
 
-  /* RESULTS (意見・質問) */
+  /* RESULTS (意見・改善点) */
   #results-screen { min-height: 100vh; }
   .refresh-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 20px; background: var(--surface2); border-bottom: 1px solid var(--border); font-size: 11px; color: var(--muted); }
   .refresh-bar button { background: none; border: none; color: var(--accent); font-size: 12px; cursor: pointer; font-weight: 600; }
@@ -241,10 +241,11 @@
     <button class="home-action-btn btn-comment" onclick="goComment()">
       <span class="btn-icon">💬</span>
       <span class="btn-label">
-        <span>意見・質問を記録する</span>
+        <span>意見・改善点を記録する</span>
         <span class="btn-sub">質問・改善案・宿題などを入力</span>
       </span>
     </button>
+    <button onclick="showResults()" style="background:none;border:none;color:var(--accent);font-size:13px;cursor:pointer;text-align:left;padding:2px 4px;text-decoration:underline;">📋 意見・改善点を確認する</button>
     <button class="home-action-btn btn-vote" onclick="goVote()">
       <span class="btn-icon">🗳️</span>
       <span class="btn-label">
@@ -252,8 +253,8 @@
         <span class="btn-sub">1,000万円を各提案に配分</span>
       </span>
     </button>
+    <button onclick="showVoteResults()" style="background:none;border:none;color:var(--accent);font-size:13px;cursor:pointer;text-align:left;padding:2px 4px;text-decoration:underline;">📊 投票集計を見る</button>
     <div class="home-secondary">
-      <button onclick="showResults()">📋 意見・質問を確認する</button>
       <button onclick="showAdmin()">⚙ 設定を編集</button>
     </div>
   </div>
@@ -263,13 +264,13 @@
 <div id="comment-screen" class="screen">
   <div class="app-header">
     <button class="back-btn" onclick="goHome()">←</button>
-    <div class="title">意見・質問を記録</div>
+    <div class="title">意見・改善点を記録</div>
     <div class="sub" id="comment-voter-label"></div>
   </div>
   <div class="comment-body">
     <div>
       <div class="section-label">内容を入力</div>
-      <textarea class="comment-textarea" id="comment-textarea" placeholder="意見・質問・改善案・宿題などを入力"></textarea>
+      <textarea class="comment-textarea" id="comment-textarea" placeholder="意見・改善点・改善案・宿題などを入力"></textarea>
     </div>
     <div>
       <div class="section-label">どの提案について？</div>
@@ -301,11 +302,11 @@
   </div>
 </div>
 
-<!-- RESULTS (意見・質問一覧) -->
+<!-- RESULTS (意見・改善点一覧) -->
 <div id="results-screen" class="screen">
   <div class="app-header">
     <button class="back-btn" onclick="goHome()">←</button>
-    <div class="title">意見・質問 一覧</div>
+    <div class="title">意見・改善点 一覧</div>
     <button class="back-btn" style="margin-left:auto;font-size:18px;" onclick="fetchAndRenderComments()">↻</button>
   </div>
   <div class="refresh-bar">
@@ -791,7 +792,7 @@ function closeVoteDone() {
   goHome();
 }
 
-// ===== RESULTS (意見・質問) =====
+// ===== RESULTS (意見・改善点) =====
 let resultsRefreshTimer = null;
 
 async function showResults() {
@@ -821,7 +822,7 @@ function renderComments() {
   if (!STATE.comments.length) {
     const empty = document.createElement('div');
     empty.className = 'no-comments';
-    empty.textContent = 'まだ意見・質問は記録されていません';
+    empty.textContent = 'まだ意見・改善点は記録されていません';
     pane.appendChild(empty);
     return;
   }
@@ -829,7 +830,7 @@ function renderComments() {
   // 全件（時系列）
   const hdr = document.createElement('div');
   hdr.style.cssText = 'font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;';
-  hdr.textContent = `すべての意見・質問（${STATE.comments.length}件）`;
+  hdr.textContent = `すべての意見・改善点（${STATE.comments.length}件）`;
   pane.appendChild(hdr);
 
   [...STATE.comments].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0)).forEach(c => {
