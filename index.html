@@ -17,7 +17,6 @@
     --border: #dde2ea;
     --pass: #3aaa7e;
     --fail: #a0a8b8;
-    --budget: 1000;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', sans-serif; min-height: 100vh; }
@@ -40,19 +39,30 @@
 
   .primary-btn { background: var(--accent); color: white; border: none; border-radius: 10px; padding: 16px 32px; font-size: 16px; font-weight: 700; cursor: pointer; width: 100%; letter-spacing: 1px; }
   .primary-btn:hover { opacity: 0.9; }
-
   .save-notice { font-size: 12px; color: var(--muted); text-align: center; margin-top: 8px; }
 
-  /* ========== VOTER SELECT SCREEN ========== */
+  /* ========== SELECT NAME SCREEN ========== */
   #select-voter-screen { padding: 20px; max-width: 500px; margin: 0 auto; }
-  .select-voter-header { text-align: center; padding: 32px 0 24px; }
-  .select-voter-header h1 { font-size: 22px; font-weight: 700; color: var(--text); }
+  .select-voter-header { text-align: center; padding: 28px 0 20px; }
+  .select-voter-header h1 { font-size: 20px; font-weight: 700; color: var(--text); }
   .voter-select-grid { display: flex; flex-direction: column; gap: 10px; }
-  .voter-select-btn { background: var(--surface); border: 2px solid var(--border); border-radius: 12px; padding: 16px 20px; text-align: left; cursor: pointer; color: var(--text); font-size: 15px; font-weight: 600; transition: all 0.15s; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+
+  .voter-select-btn { background: var(--surface); border: 2px solid var(--border); border-radius: 12px; padding: 14px 18px; text-align: left; cursor: pointer; color: var(--text); font-size: 15px; font-weight: 600; transition: all 0.15s; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
   .voter-select-btn:hover { border-color: var(--accent); background: #eef2fa; }
   .voter-select-btn.voted { border-color: var(--pass); background: #f0faf6; }
   .voter-select-btn .voted-badge { font-size: 11px; background: var(--pass); color: white; padding: 3px 10px; border-radius: 10px; margin-left: auto; }
   .voter-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0; }
+
+  /* 名前タップ後の2択モーダル */
+  .action-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 100; align-items: flex-end; justify-content: center; }
+  .action-modal.open { display: flex; }
+  .action-sheet { background: var(--surface); border-radius: 20px 20px 0 0; padding: 24px 20px 36px; width: 100%; max-width: 500px; }
+  .action-sheet-name { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 18px; }
+  .action-sheet-btns { display: flex; flex-direction: column; gap: 10px; }
+  .action-sheet-btn { border: none; border-radius: 12px; padding: 18px; font-size: 16px; font-weight: 700; cursor: pointer; text-align: center; }
+  .action-vote { background: var(--accent); color: white; }
+  .action-comment { background: var(--surface2); color: var(--text); border: 2px solid var(--border); }
+  .action-cancel { background: none; color: var(--muted); font-size: 14px; margin-top: 4px; }
 
   /* ========== VOTER SCREEN ========== */
   #voter-screen { min-height: 100vh; display: flex; flex-direction: column; }
@@ -71,18 +81,12 @@
   .budget-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
   .budget-fill { height: 100%; border-radius: 4px; transition: width 0.3s, background 0.3s; }
 
-  /* 2列グリッド */
-  .plans-container { flex: 1; padding: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-content: start; }
-  @media (max-width: 500px) {
-    .plans-container { grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px; }
-  }
-
+  .plans-container { flex: 1; padding: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-content: start; }
   .plan-card { background: var(--surface); border: 2px solid var(--border); border-radius: 12px; padding: 14px; transition: border-color 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 10px; }
   .plan-card.has-vote { border-color: var(--accent); background: #f5f8ff; }
   .plan-name { font-size: 14px; font-weight: 700; color: var(--text); word-break: break-all; line-height: 1.4; }
   .plan-proposer { font-size: 11px; color: var(--muted); margin-top: 2px; }
   .plan-badge { font-size: 10px; background: #eef2fa; color: var(--accent); padding: 3px 8px; border-radius: 20px; border: 1px solid #ccd5ea; display: inline-block; margin-top: 4px; }
-
   .plan-card.own-plan { opacity: 0.5; border-style: dashed; }
   .own-badge { background: var(--surface2) !important; color: var(--muted) !important; border-color: var(--border) !important; }
   .own-plan-notice { text-align: center; padding: 10px 0 4px; color: var(--muted); font-size: 12px; }
@@ -100,6 +104,29 @@
   .submit-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
   .submit-btn:not(:disabled):hover { opacity: 0.9; }
 
+  /* ========== COMMENT SCREEN ========== */
+  #comment-screen { min-height: 100vh; display: flex; flex-direction: column; }
+  .comment-header { background: var(--accent); padding: 14px 20px; display: flex; align-items: center; gap: 12px; }
+  .comment-header .back-btn { background: none; border: none; color: white; font-size: 20px; cursor: pointer; padding: 0; }
+  .comment-header .brand { color: white; font-weight: 700; font-size: 15px; }
+  .comment-header .voter-info { color: rgba(255,255,255,0.85); font-size: 13px; margin-left: auto; }
+
+  .comment-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
+
+  .plan-select-grid { display: flex; flex-direction: column; gap: 8px; }
+  .plan-select-item { background: var(--surface); border: 2px solid var(--border); border-radius: 10px; padding: 14px 16px; cursor: pointer; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; transition: all 0.15s; }
+  .plan-select-item:hover { border-color: var(--accent); background: #eef2fa; }
+  .plan-select-item.selected { border-color: var(--accent); background: #eef2fa; }
+  .plan-select-item .plan-meta { font-size: 11px; color: var(--muted); font-weight: 400; }
+
+  .comment-input-area { display: flex; flex-direction: column; gap: 10px; }
+  .comment-textarea { width: 100%; border: 2px solid var(--border); border-radius: 12px; padding: 14px; font-size: 15px; font-family: inherit; resize: none; min-height: 120px; background: var(--surface); color: var(--text); outline: none; transition: border-color 0.2s; }
+  .comment-textarea:focus { border-color: var(--accent); }
+  .comment-send-btn { background: var(--accent); color: white; border: none; border-radius: 10px; padding: 15px; font-size: 16px; font-weight: 700; cursor: pointer; width: 100%; }
+  .comment-send-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+  .section-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+
   /* ========== RESULTS SCREEN ========== */
   #results-screen { padding: 0; }
   .results-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
@@ -108,6 +135,11 @@
   .ctrl-btn { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 8px; padding: 8px 14px; cursor: pointer; font-size: 13px; }
   .ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
   .ctrl-btn.danger { border-color: #e05555; color: #e05555; }
+
+  /* タブ */
+  .result-tabs { display: flex; background: var(--surface2); border-bottom: 1px solid var(--border); }
+  .result-tab { flex: 1; padding: 12px; text-align: center; font-size: 13px; font-weight: 600; color: var(--muted); border: none; background: none; cursor: pointer; border-bottom: 3px solid transparent; }
+  .result-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
   .results-summary { padding: 16px 20px; background: var(--surface2); border-bottom: 1px solid var(--border); display: flex; gap: 20px; flex-wrap: wrap; }
   .stat-box { text-align: center; }
@@ -119,7 +151,6 @@
   .result-card.passed { border-color: var(--pass); background: #f5fdf8; }
   .result-card.passed::before { content: "PASS"; position: absolute; top: 12px; right: 12px; background: var(--pass); color: white; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; letter-spacing: 1px; }
   .result-card.failed::before { content: "FAIL"; position: absolute; top: 12px; right: 12px; background: var(--border); color: var(--muted); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; letter-spacing: 1px; }
-
   .result-plan-name { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
   .result-proposer { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
   .result-total { font-size: 32px; font-weight: 900; margin-bottom: 4px; }
@@ -127,13 +158,32 @@
   .result-total.fail-color { color: var(--muted); }
   .result-bar-wrap { height: 10px; background: var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 14px; }
   .result-bar { height: 100%; border-radius: 6px; transition: width 1s cubic-bezier(.4,0,.2,1); }
-
   .voter-breakdown { display: flex; flex-direction: column; gap: 6px; }
   .voter-row { display: flex; align-items: center; gap: 8px; }
-  .voter-name { width: 72px; font-size: 12px; color: var(--muted); flex-shrink: 0; }
+  .voter-name-col { width: 72px; font-size: 12px; color: var(--muted); flex-shrink: 0; }
   .voter-bar-wrap { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
   .voter-bar { height: 100%; border-radius: 4px; background: var(--accent); transition: width 0.8s; }
   .voter-vote { width: 60px; text-align: right; font-size: 12px; color: var(--text); }
+
+  /* コメント一覧 */
+  .comments-pane { padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+  .comment-plan-group { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .comment-plan-title { padding: 12px 16px; background: var(--surface2); font-size: 13px; font-weight: 700; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .comment-count-badge { font-size: 11px; background: var(--accent); color: white; padding: 2px 8px; border-radius: 10px; }
+  .comment-item { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .comment-item:last-child { border-bottom: none; }
+  .comment-meta { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .comment-text { font-size: 14px; color: var(--text); line-height: 1.6; }
+
+  .all-comments-list { display: flex; flex-direction: column; gap: 10px; }
+  .all-comment-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .all-comment-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .comment-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .comment-who { font-size: 13px; font-weight: 700; }
+  .comment-when { font-size: 11px; color: var(--muted); margin-left: auto; }
+  .comment-plan-tag { font-size: 11px; background: #eef2fa; color: var(--accent); padding: 2px 8px; border-radius: 10px; border: 1px solid #ccd5ea; }
+
+  .no-comments { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; }
 
   /* ========== MODALS ========== */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; }
@@ -151,9 +201,9 @@
   .toast-popup.open { display: flex; }
   .toast-box { background: white; border-radius: 20px; padding: 36px 28px; text-align: center; max-width: 320px; width: 88%; box-shadow: 0 12px 40px rgba(0,0,0,0.18); }
   .toast-icon { font-size: 52px; margin-bottom: 14px; }
-  .toast-title { font-size: 20px; font-weight: 800; color: var(--pass); margin-bottom: 8px; }
+  .toast-title { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
   .toast-sub { font-size: 14px; color: var(--muted); line-height: 1.6; }
-  .toast-ok { margin-top: 24px; background: var(--pass); color: white; border: none; border-radius: 10px; padding: 13px 40px; font-size: 15px; font-weight: 700; cursor: pointer; }
+  .toast-ok { margin-top: 24px; color: white; border: none; border-radius: 10px; padding: 13px 40px; font-size: 15px; font-weight: 700; cursor: pointer; }
 
   @keyframes countUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   .animate-in { animation: countUp 0.5s ease forwards; }
@@ -166,29 +216,41 @@
   <div class="admin-header">
     <h1>2026年DM合宿投資計画</h1>
   </div>
-
-  <div class="card">
-    <h2>氏名と事業名を入力</h2>
-    <div style="display:grid;grid-template-columns:1fr 2fr;gap:8px;font-size:11px;color:var(--muted);padding:0 4px 8px;">
-      <span>氏名</span><span>事業名</span>
+  <div style="padding: 0 20px; max-width: 700px; margin: 0 auto;">
+    <div class="card">
+      <h2>氏名と事業名を入力</h2>
+      <div style="display:grid;grid-template-columns:1fr 2fr;gap:8px;font-size:11px;color:var(--muted);padding:0 4px 8px;">
+        <span>氏名</span><span>事業名</span>
+      </div>
+      <div class="plan-inputs" id="plan-inputs"></div>
     </div>
-    <div class="plan-inputs" id="plan-inputs"></div>
+    <button class="primary-btn" onclick="startSession()">▶ 投票セッション開始</button>
+    <p class="save-notice">入力内容は自動保存されます</p>
   </div>
-
-  <button class="primary-btn" onclick="startSession()">▶ 投票セッション開始</button>
-  <p class="save-notice">入力内容は自動保存されます</p>
 </div>
 
-<!-- SELECT VOTER SCREEN -->
+<!-- SELECT NAME SCREEN -->
 <div id="select-voter-screen" class="screen">
   <div class="select-voter-header">
     <h1>自分の名前を選択してください</h1>
   </div>
-  <div style="padding: 0 20px;">
+  <div style="padding: 0 20px; max-width: 500px; margin: 0 auto;">
     <div class="voter-select-grid" id="voter-select-grid"></div>
-    <div style="margin-top: 20px; text-align: center;">
-      <button class="ctrl-btn" onclick="showResults()">📊 現在の集計を確認</button>
-      <button class="ctrl-btn" onclick="showAdmin()" style="margin-left:8px;">⚙ 設定を編集</button>
+    <div style="margin-top: 20px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+      <button class="ctrl-btn" onclick="showResults()">📊 集計を確認</button>
+      <button class="ctrl-btn" onclick="showAdmin()">⚙ 設定を編集</button>
+    </div>
+  </div>
+</div>
+
+<!-- ACTION SHEET (名前タップ後の2択) -->
+<div class="action-modal" id="action-modal">
+  <div class="action-sheet">
+    <div class="action-sheet-name" id="action-sheet-name"></div>
+    <div class="action-sheet-btns">
+      <button class="action-sheet-btn action-vote" onclick="goVote()">🗳️ 投票する</button>
+      <button class="action-sheet-btn action-comment" onclick="goComment()">💬 意見・質問を記録する</button>
+      <button class="action-sheet-btn action-cancel" onclick="closeActionSheet()">キャンセル</button>
     </div>
   </div>
 </div>
@@ -205,7 +267,7 @@
       <div class="budget-number ok" id="remaining-display">1,000</div>
       <div class="budget-unit">万円</div>
       <div class="budget-track">
-        <div class="budget-fill" id="budget-fill" style="width: 100%; background: var(--pass);"></div>
+        <div class="budget-fill" id="budget-fill" style="width:100%;background:var(--pass);"></div>
       </div>
     </div>
   </div>
@@ -216,18 +278,51 @@
   </div>
 </div>
 
+<!-- COMMENT SCREEN -->
+<div id="comment-screen" class="screen">
+  <div class="comment-header">
+    <button class="back-btn" onclick="showSelectVoter()">←</button>
+    <div class="brand">意見・質問を記録</div>
+    <div class="voter-info" id="comment-voter-label"></div>
+  </div>
+  <div class="comment-body">
+    <div>
+      <div class="section-label">どの提案についてですか？</div>
+      <div class="plan-select-grid" id="comment-plan-select"></div>
+    </div>
+    <div class="comment-input-area">
+      <div class="section-label">内容を入力</div>
+      <textarea class="comment-textarea" id="comment-textarea" placeholder="意見・質問・改善案などを入力してください" rows="5"></textarea>
+      <button class="comment-send-btn" id="comment-send-btn" onclick="submitComment()">記録する</button>
+    </div>
+  </div>
+</div>
+
 <!-- RESULTS SCREEN -->
 <div id="results-screen" class="screen">
   <div class="results-header">
-    <h1>📊 リアルタイム集計</h1>
+    <h1>📊 集計・記録</h1>
     <div class="controls">
-      <button class="ctrl-btn" onclick="showSelectVoter()">← 投票に戻る</button>
+      <button class="ctrl-btn" onclick="showSelectVoter()">← 戻る</button>
       <button class="ctrl-btn" onclick="exportResults()">CSV出力</button>
       <button class="ctrl-btn danger" onclick="confirmReset()">リセット</button>
     </div>
   </div>
-  <div class="results-summary" id="results-summary"></div>
-  <div class="results-grid" id="results-grid"></div>
+  <div class="result-tabs">
+    <button class="result-tab active" onclick="switchResultTab('votes')">🗳️ 投票結果</button>
+    <button class="result-tab" onclick="switchResultTab('comments')">💬 意見・質問</button>
+  </div>
+
+  <!-- 投票結果タブ -->
+  <div id="tab-votes">
+    <div class="results-summary" id="results-summary"></div>
+    <div class="results-grid" id="results-grid"></div>
+  </div>
+
+  <!-- 意見・質問タブ -->
+  <div id="tab-comments" style="display:none;">
+    <div class="comments-pane" id="comments-pane"></div>
+  </div>
 </div>
 
 <!-- MODAL: Submit Confirm -->
@@ -246,7 +341,7 @@
 <div class="modal-overlay" id="reset-modal">
   <div class="modal">
     <h3>全データをリセットしますか？</h3>
-    <p>すべての投票データが削除されます。この操作は元に戻せません。</p>
+    <p>投票・コメントすべてのデータが削除されます。この操作は元に戻せません。</p>
     <div class="modal-btns">
       <button class="modal-cancel" onclick="closeModal('reset-modal')">キャンセル</button>
       <button class="modal-confirm" onclick="resetAll()">リセットする</button>
@@ -258,22 +353,32 @@
 <div class="toast-popup" id="vote-done-popup">
   <div class="toast-box">
     <div class="toast-icon">✅</div>
-    <div class="toast-title">投票を受け付けました</div>
+    <div class="toast-title" style="color:var(--pass);">投票を受け付けました</div>
     <div class="toast-sub" id="vote-done-name"></div>
-    <button class="toast-ok" onclick="closeVoteDone()">OK</button>
+    <button class="toast-ok" style="background:var(--pass);" onclick="closeVoteDone()">OK</button>
+  </div>
+</div>
+
+<!-- 意見記録完了ポップアップ -->
+<div class="toast-popup" id="comment-done-popup">
+  <div class="toast-box">
+    <div class="toast-icon">💬</div>
+    <div class="toast-title" style="color:var(--accent);">記録しました</div>
+    <div class="toast-sub" id="comment-done-text"></div>
+    <button class="toast-ok" style="background:var(--accent);" onclick="closeCommentDone()">続けて記録する</button>
+    <br>
+    <button onclick="closeCommentDoneBack()" style="margin-top:12px;background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;">名前選択に戻る</button>
   </div>
 </div>
 
 <script>
 const NAMES = ['中濱','黒井','伊藤','三村','青山','武居','松村','平本','松下'];
+const DEFAULT_PLANS = NAMES.map(n => n + 'さんの投資計画');
 
 const STATE = {
-  plans: [],
-  members: [],
-  votes: {},
-  currentVoter: null,
-  BUDGET: 1000,
-  THRESHOLD: 3000,
+  plans: [], members: [], votes: {}, comments: [],
+  currentVoter: null, selectedPlanId: null,
+  BUDGET: 1000, THRESHOLD: 3000,
 };
 
 window.addEventListener('load', () => {
@@ -282,29 +387,34 @@ window.addEventListener('load', () => {
 });
 
 function buildAdminInputs() {
-  const planInputs = document.getElementById('plan-inputs');
-  planInputs.innerHTML = '';
+  const container = document.getElementById('plan-inputs');
+  container.innerHTML = '';
   NAMES.forEach((name, i) => {
     const row = document.createElement('div');
     row.className = 'plan-row';
     row.innerHTML = `
       <input type="text" value="${name}" class="plan-proposer-input" placeholder="氏名">
-      <input type="text" class="plan-name-input" placeholder="事業名を入力" oninput="autoSaveAdmin()">
+      <input type="text" value="${DEFAULT_PLANS[i]}" class="plan-name-input" placeholder="事業名" oninput="autoSaveAdmin()">
     `;
-    planInputs.appendChild(row);
+    container.appendChild(row);
   });
 }
 
 function autoSaveAdmin() {
-  const proposerInputs = document.querySelectorAll('.plan-proposer-input');
-  const nameInputs = document.querySelectorAll('.plan-name-input');
-  const adminData = [];
-  proposerInputs.forEach((inp, i) => {
-    adminData.push({ proposer: inp.value.trim(), name: nameInputs[i].value.trim() });
-  });
+  const adminData = getAdminInputData();
   const saved = JSON.parse(localStorage.getItem('investmentVote2026') || '{}');
   saved.adminData = adminData;
   localStorage.setItem('investmentVote2026', JSON.stringify(saved));
+}
+
+function getAdminInputData() {
+  const proposerInputs = document.querySelectorAll('.plan-proposer-input');
+  const nameInputs = document.querySelectorAll('.plan-name-input');
+  const data = [];
+  proposerInputs.forEach((inp, i) => {
+    data.push({ proposer: inp.value.trim(), name: nameInputs[i].value.trim() });
+  });
+  return data;
 }
 
 function loadFromStorage() {
@@ -312,20 +422,16 @@ function loadFromStorage() {
   if (!saved) return;
   try {
     const data = JSON.parse(saved);
-
-    // 管理者が登録した事業名を復元
     if (data.adminData) {
       const nameInputs = document.querySelectorAll('.plan-name-input');
       data.adminData.forEach((d, i) => {
         if (nameInputs[i] && d.name) nameInputs[i].value = d.name;
       });
     }
-
     if (data.plans && data.plans.length > 0) {
       Object.assign(STATE, {
-        plans: data.plans,
-        members: data.members,
-        votes: data.votes || {},
+        plans: data.plans, members: data.members,
+        votes: data.votes || {}, comments: data.comments || [],
       });
       showSelectVoter();
     }
@@ -336,15 +442,13 @@ function saveToStorage() {
   const saved = JSON.parse(localStorage.getItem('investmentVote2026') || '{}');
   localStorage.setItem('investmentVote2026', JSON.stringify({
     ...saved,
-    plans: STATE.plans,
-    members: STATE.members,
-    votes: STATE.votes,
+    plans: STATE.plans, members: STATE.members,
+    votes: STATE.votes, comments: STATE.comments,
   }));
 }
 
 function showAdmin() {
   showScreen('admin-screen');
-  // 事業名を復元
   const saved = JSON.parse(localStorage.getItem('investmentVote2026') || '{}');
   if (saved.adminData) {
     const nameInputs = document.querySelectorAll('.plan-name-input');
@@ -355,51 +459,70 @@ function showAdmin() {
 }
 
 function startSession() {
-  const proposerInputs = document.querySelectorAll('.plan-proposer-input');
-  const nameInputs = document.querySelectorAll('.plan-name-input');
-
+  const adminData = getAdminInputData();
   STATE.plans = [];
   STATE.members = [];
-
-  proposerInputs.forEach((inp, i) => {
-    const proposer = inp.value.trim();
-    const name = nameInputs[i].value.trim();
-    if (proposer && name) {
-      STATE.plans.push({ id: `plan_${i}`, proposer, name });
-      STATE.members.push(proposer);
+  adminData.forEach((d, i) => {
+    if (d.proposer && d.name) {
+      STATE.plans.push({ id: `plan_${i}`, proposer: d.proposer, name: d.name });
+      STATE.members.push(d.proposer);
     }
   });
-
   if (STATE.plans.length === 0) { alert('氏名と事業名を1件以上入力してください'); return; }
-
   if (!STATE.votes || Object.keys(STATE.votes).length === 0) STATE.votes = {};
+  if (!STATE.comments) STATE.comments = [];
   saveToStorage();
   showSelectVoter();
 }
 
+// ===== SELECT VOTER =====
 function showSelectVoter() {
   showScreen('select-voter-screen');
   const grid = document.getElementById('voter-select-grid');
   grid.innerHTML = '';
-  STATE.members.forEach((name) => {
+  STATE.members.forEach(name => {
     const hasVoted = !!STATE.votes[name] && Object.values(STATE.votes[name]).some(v => v > 0);
+    const commentCount = STATE.comments.filter(c => c.voter === name).length;
     const btn = document.createElement('button');
     btn.className = `voter-select-btn ${hasVoted ? 'voted' : ''}`;
     const initial = name.charAt(0);
+    const badges = [];
+    if (hasVoted) badges.push('<span class="voted-badge">投票済</span>');
+    if (commentCount > 0) badges.push(`<span class="voted-badge" style="background:var(--accent);">💬 ${commentCount}</span>`);
     btn.innerHTML = `
       <div class="voter-avatar">${initial}</div>
       <span>${name}</span>
-      ${hasVoted ? '<span class="voted-badge">投票済</span>' : ''}
+      <span style="margin-left:auto;display:flex;gap:6px;">${badges.join('')}</span>
     `;
-    if (!hasVoted) btn.onclick = () => startVoting(name);
+    btn.onclick = () => openActionSheet(name);
     grid.appendChild(btn);
   });
 }
 
+// ===== ACTION SHEET =====
+let _pendingVoter = null;
+function openActionSheet(name) {
+  _pendingVoter = name;
+  document.getElementById('action-sheet-name').textContent = name + ' さん';
+  document.getElementById('action-modal').classList.add('open');
+}
+function closeActionSheet() {
+  document.getElementById('action-modal').classList.remove('open');
+  _pendingVoter = null;
+}
+function goVote() {
+  closeActionSheet();
+  startVoting(_pendingVoter);
+}
+function goComment() {
+  closeActionSheet();
+  startComment(_pendingVoter);
+}
+
+// ===== VOTING =====
 function startVoting(voterName) {
   STATE.currentVoter = voterName;
   document.getElementById('voter-info-label').textContent = voterName;
-
   const currentVotes = STATE.votes[voterName] || {};
   const container = document.getElementById('plans-container');
   container.innerHTML = '';
@@ -410,7 +533,6 @@ function startVoting(voterName) {
     const card = document.createElement('div');
     card.className = `plan-card ${currentAmount > 0 ? 'has-vote' : ''} ${isOwn ? 'own-plan' : ''}`;
     card.id = `card_${plan.id}`;
-
     if (isOwn) {
       card.innerHTML = `
         <div>
@@ -427,9 +549,9 @@ function startVoting(voterName) {
           <div class="plan-proposer">${plan.proposer}</div>
         </div>
         <div class="vote-control">
-          <button class="vote-btn" onclick="adjustVote('${plan.id}', -50)" id="minus_${plan.id}">−</button>
+          <button class="vote-btn" onclick="adjustVote('${plan.id}', -50)">−</button>
           <div class="vote-amount" id="amount_${plan.id}">${currentAmount.toLocaleString()}<span>万円</span></div>
-          <button class="vote-btn" onclick="adjustVote('${plan.id}', 50)" id="plus_${plan.id}">＋</button>
+          <button class="vote-btn" onclick="adjustVote('${plan.id}', 50)">＋</button>
         </div>
       `;
     }
@@ -441,22 +563,17 @@ function startVoting(voterName) {
     if (p.proposer === voterName) STATE.votes[voterName][p.id] = 0;
     else if (STATE.votes[voterName][p.id] === undefined) STATE.votes[voterName][p.id] = 0;
   });
-
   updateBudgetDisplay();
   showScreen('voter-screen');
 }
 
 function getVoterVotes() { return STATE.votes[STATE.currentVoter] || {}; }
-
-function getTotalAllocated() {
-  return Object.values(getVoterVotes()).reduce((a, b) => a + b, 0);
-}
+function getTotalAllocated() { return Object.values(getVoterVotes()).reduce((a, b) => a + b, 0); }
 
 function adjustVote(planId, delta) {
   const votes = getVoterVotes();
   const current = votes[planId] || 0;
-  const total = getTotalAllocated();
-  const remaining = STATE.BUDGET - total;
+  const remaining = STATE.BUDGET - getTotalAllocated();
   let next = current + delta;
   if (next < 0) next = 0;
   if (delta > 0 && remaining < delta) next = current;
@@ -467,8 +584,7 @@ function adjustVote(planId, delta) {
 }
 
 function updateVotePlanDisplay(planId) {
-  const votes = getVoterVotes();
-  const amount = votes[planId] || 0;
+  const amount = (getVoterVotes())[planId] || 0;
   document.getElementById(`amount_${planId}`).innerHTML = `${amount.toLocaleString()}<span>万円</span>`;
   const card = document.getElementById(`card_${planId}`);
   if (amount > 0) card.classList.add('has-vote');
@@ -478,59 +594,32 @@ function updateVotePlanDisplay(planId) {
 function updateBudgetDisplay() {
   const total = getTotalAllocated();
   const remaining = STATE.BUDGET - total;
-  const pct = (total / STATE.BUDGET) * 100;
-
   const display = document.getElementById('remaining-display');
   const fill = document.getElementById('budget-fill');
   display.textContent = remaining.toLocaleString();
-
-  if (remaining > 300) {
-    display.className = 'budget-number ok';
-    fill.style.background = 'var(--pass)';
-  } else if (remaining > 0) {
-    display.className = 'budget-number warn';
-    fill.style.background = 'var(--accent2)';
-  } else {
-    display.className = 'budget-number over';
-    fill.style.background = '#e05555';
-  }
-  fill.style.width = `${100 - pct}%`;
-
+  if (remaining > 300) { display.className = 'budget-number ok'; fill.style.background = 'var(--pass)'; }
+  else if (remaining > 0) { display.className = 'budget-number warn'; fill.style.background = 'var(--accent2)'; }
+  else { display.className = 'budget-number over'; fill.style.background = '#e05555'; }
+  fill.style.width = `${100 - (total / STATE.BUDGET) * 100}%`;
   const submitBtn = document.getElementById('submit-btn');
   const summary = document.getElementById('submit-summary');
-  if (total === 0) {
-    submitBtn.disabled = true;
-    summary.textContent = '1万円以上投資してから確定してください';
-  } else if (remaining < 0) {
-    submitBtn.disabled = true;
-    summary.textContent = `予算オーバー（${Math.abs(remaining)}万円超過）`;
-  } else {
-    submitBtn.disabled = false;
-    summary.textContent = `投資合計：${total}万円 ／ 残り：${remaining}万円`;
-  }
+  if (total === 0) { submitBtn.disabled = true; summary.textContent = '1万円以上投資してから確定してください'; }
+  else if (remaining < 0) { submitBtn.disabled = true; summary.textContent = `予算オーバー（${Math.abs(remaining)}万円超過）`; }
+  else { submitBtn.disabled = false; summary.textContent = `投資合計：${total}万円 ／ 残り：${remaining}万円`; }
 }
 
 function confirmSubmit() {
-  const total = getTotalAllocated();
   const votes = getVoterVotes();
-  let lines = [];
-  STATE.plans.forEach(p => {
-    const amt = votes[p.id] || 0;
-    if (amt > 0) lines.push(`・${p.name}：${amt}万円`);
-  });
+  const lines = STATE.plans.filter(p => (votes[p.id] || 0) > 0).map(p => `・${p.name}：${votes[p.id]}万円`);
   if (lines.length === 0) return;
-  document.getElementById('submit-modal-text').textContent =
-    `${lines.join('\n')}\n\n合計：${total}万円`;
+  document.getElementById('submit-modal-text').textContent = `${lines.join('\n')}\n\n合計：${getTotalAllocated()}万円`;
   openModal('submit-modal');
 }
 
 function submitVote() {
   closeModal('submit-modal');
   saveToStorage();
-
-  // 完了ポップアップ
-  document.getElementById('vote-done-name').textContent =
-    `${STATE.currentVoter} さんの投票を記録しました`;
+  document.getElementById('vote-done-name').textContent = `${STATE.currentVoter} さんの投票を記録しました`;
   document.getElementById('vote-done-popup').classList.add('open');
 }
 
@@ -539,34 +628,104 @@ function closeVoteDone() {
   showSelectVoter();
 }
 
-function showResults() {
-  showScreen('results-screen');
-  renderResults();
+// ===== COMMENT =====
+function startComment(voterName) {
+  STATE.currentVoter = voterName;
+  STATE.selectedPlanId = null;
+  document.getElementById('comment-voter-label').textContent = voterName;
+  document.getElementById('comment-textarea').value = '';
+
+  const grid = document.getElementById('comment-plan-select');
+  grid.innerHTML = '';
+  STATE.plans.forEach(plan => {
+    const item = document.createElement('div');
+    item.className = 'plan-select-item';
+    item.id = `psel_${plan.id}`;
+    item.innerHTML = `
+      <div>
+        <div style="font-size:14px;font-weight:600;">${plan.name}</div>
+        <div class="plan-meta">${plan.proposer}</div>
+      </div>
+    `;
+    item.onclick = () => selectCommentPlan(plan.id);
+    grid.appendChild(item);
+  });
+  updateCommentSendBtn();
+  showScreen('comment-screen');
 }
 
-function renderResults() {
-  const votedCount = Object.keys(STATE.votes).filter(k =>
-    Object.values(STATE.votes[k]).some(v => v > 0)
-  ).length;
+function selectCommentPlan(planId) {
+  STATE.selectedPlanId = planId;
+  document.querySelectorAll('.plan-select-item').forEach(el => el.classList.remove('selected'));
+  document.getElementById(`psel_${planId}`).classList.add('selected');
+  updateCommentSendBtn();
+  document.getElementById('comment-textarea').focus();
+}
 
-  const summary = document.getElementById('results-summary');
-  summary.innerHTML = `
-    <div class="stat-box">
-      <div class="stat-value" style="color:var(--accent)">${votedCount}</div>
-      <div class="stat-label">投票済み</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-value" style="color:var(--muted)">${STATE.members.length - votedCount}</div>
-      <div class="stat-label">未投票</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-value" style="color:var(--gold)">${STATE.members.length}</div>
-      <div class="stat-label">合計人数</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-value" style="color:var(--pass)">${STATE.THRESHOLD.toLocaleString()}万円</div>
-      <div class="stat-label">通過ライン</div>
-    </div>
+function updateCommentSendBtn() {
+  const hasText = document.getElementById('comment-textarea').value.trim().length > 0;
+  document.getElementById('comment-send-btn').disabled = !STATE.selectedPlanId || !hasText;
+}
+
+document.addEventListener('input', e => {
+  if (e.target.id === 'comment-textarea') updateCommentSendBtn();
+});
+
+function submitComment() {
+  const text = document.getElementById('comment-textarea').value.trim();
+  if (!text || !STATE.selectedPlanId) return;
+  const plan = STATE.plans.find(p => p.id === STATE.selectedPlanId);
+  const now = new Date();
+  const timeStr = `${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+  STATE.comments.push({
+    id: Date.now(), voter: STATE.currentVoter,
+    planId: STATE.selectedPlanId, planName: plan.name,
+    text, time: timeStr,
+    timestamp: now.getTime(),
+  });
+  saveToStorage();
+
+  const popup = document.getElementById('comment-done-popup');
+  document.getElementById('comment-done-text').textContent =
+    `「${plan.name}」についての意見を記録しました`;
+  popup.classList.add('open');
+}
+
+function closeCommentDone() {
+  document.getElementById('comment-done-popup').classList.remove('open');
+  // 続けて記録：提案は選択状態のまま、テキストだけクリア
+  document.getElementById('comment-textarea').value = '';
+  updateCommentSendBtn();
+}
+
+function closeCommentDoneBack() {
+  document.getElementById('comment-done-popup').classList.remove('open');
+  showSelectVoter();
+}
+
+// ===== RESULTS =====
+function showResults() {
+  showScreen('results-screen');
+  switchResultTab('votes');
+}
+
+function switchResultTab(tab) {
+  document.querySelectorAll('.result-tab').forEach((el, i) => {
+    el.classList.toggle('active', (i === 0 && tab === 'votes') || (i === 1 && tab === 'comments'));
+  });
+  document.getElementById('tab-votes').style.display = tab === 'votes' ? 'block' : 'none';
+  document.getElementById('tab-comments').style.display = tab === 'comments' ? 'block' : 'none';
+  if (tab === 'votes') renderVotes();
+  else renderComments();
+}
+
+function renderVotes() {
+  const votedCount = Object.keys(STATE.votes).filter(k => Object.values(STATE.votes[k]).some(v => v > 0)).length;
+  document.getElementById('results-summary').innerHTML = `
+    <div class="stat-box"><div class="stat-value" style="color:var(--accent)">${votedCount}</div><div class="stat-label">投票済み</div></div>
+    <div class="stat-box"><div class="stat-value" style="color:var(--muted)">${STATE.members.length - votedCount}</div><div class="stat-label">未投票</div></div>
+    <div class="stat-box"><div class="stat-value" style="color:var(--gold)">${STATE.members.length}</div><div class="stat-label">合計人数</div></div>
+    <div class="stat-box"><div class="stat-value" style="color:var(--pass)">${STATE.THRESHOLD.toLocaleString()}万円</div><div class="stat-label">通過ライン</div></div>
   `;
 
   const planTotals = STATE.plans.map(plan => {
@@ -578,91 +737,132 @@ function renderResults() {
       breakdown.push({ member, amt });
     });
     return { ...plan, total, breakdown };
-  });
-
-  planTotals.sort((a, b) => b.total - a.total);
+  }).sort((a, b) => b.total - a.total);
 
   const maxTotal = Math.max(...planTotals.map(p => p.total), STATE.THRESHOLD);
   const grid = document.getElementById('results-grid');
   grid.innerHTML = '';
-
   planTotals.forEach((plan, idx) => {
     const passed = plan.total >= STATE.THRESHOLD;
     const card = document.createElement('div');
     card.className = `result-card ${passed ? 'passed' : 'failed'} animate-in`;
     card.style.animationDelay = `${idx * 0.1}s`;
-
     const barPct = maxTotal > 0 ? (plan.total / maxTotal) * 100 : 0;
-    const barColor = passed ? 'var(--pass)' : 'var(--muted)';
-    const totalColor = passed ? 'pass-color' : 'fail-color';
-
     const breakdownHTML = plan.breakdown.map(b => {
       const bPct = STATE.BUDGET > 0 ? (b.amt / STATE.BUDGET) * 100 : 0;
-      return `
-        <div class="voter-row">
-          <div class="voter-name">${b.member}</div>
-          <div class="voter-bar-wrap">
-            <div class="voter-bar" style="width:${bPct}%;background:${b.amt > 0 ? 'var(--accent)' : 'transparent'}"></div>
-          </div>
-          <div class="voter-vote">${b.amt > 0 ? b.amt + '万円' : '—'}</div>
-        </div>
-      `;
+      return `<div class="voter-row">
+        <div class="voter-name-col">${b.member}</div>
+        <div class="voter-bar-wrap"><div class="voter-bar" style="width:${bPct}%;background:${b.amt > 0 ? 'var(--accent)' : 'transparent'}"></div></div>
+        <div class="voter-vote">${b.amt > 0 ? b.amt + '万円' : '—'}</div>
+      </div>`;
     }).join('');
-
     card.innerHTML = `
       <div class="result-plan-name">${plan.name}</div>
       <div class="result-proposer">提案者：${plan.proposer}</div>
-      <div class="result-total ${totalColor}">${plan.total.toLocaleString()}<span style="font-size:14px;color:var(--muted);font-weight:400">万円</span></div>
+      <div class="result-total ${passed ? 'pass-color' : 'fail-color'}">${plan.total.toLocaleString()}<span style="font-size:14px;color:var(--muted);font-weight:400">万円</span></div>
       <div style="font-size:12px;color:var(--muted);margin-bottom:8px">通過ライン：${STATE.THRESHOLD.toLocaleString()}万円${passed ? ' ✅ 通過' : ` （あと${(STATE.THRESHOLD - plan.total).toLocaleString()}万円）`}</div>
-      <div class="result-bar-wrap">
-        <div class="result-bar" style="width:${barPct}%;background:${barColor}"></div>
-      </div>
+      <div class="result-bar-wrap"><div class="result-bar" style="width:${barPct}%;background:${passed ? 'var(--pass)' : 'var(--muted)'}"></div></div>
       <div class="voter-breakdown">${breakdownHTML}</div>
     `;
     grid.appendChild(card);
   });
 }
 
+function renderComments() {
+  const pane = document.getElementById('comments-pane');
+  if (STATE.comments.length === 0) {
+    pane.innerHTML = '<div class="no-comments">まだ意見・質問は記録されていません</div>';
+    return;
+  }
+
+  // 提案ごとにグループ化
+  const byPlan = {};
+  STATE.plans.forEach(p => { byPlan[p.id] = { plan: p, comments: [] }; });
+  STATE.comments.forEach(c => {
+    if (byPlan[c.planId]) byPlan[c.planId].comments.push(c);
+  });
+
+  pane.innerHTML = '';
+
+  // 全件を時系列で表示
+  const allHeader = document.createElement('div');
+  allHeader.innerHTML = `<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">すべての意見・質問（${STATE.comments.length}件）</div>`;
+  pane.appendChild(allHeader);
+
+  const allList = document.createElement('div');
+  allList.className = 'all-comments-list';
+  [...STATE.comments].sort((a, b) => a.timestamp - b.timestamp).forEach(c => {
+    const item = document.createElement('div');
+    item.className = 'all-comment-card';
+    item.innerHTML = `
+      <div class="all-comment-header">
+        <div class="comment-avatar">${c.voter.charAt(0)}</div>
+        <div class="comment-who">${c.voter}</div>
+        <div class="comment-when">${c.time}</div>
+      </div>
+      <div class="comment-plan-tag" style="margin-bottom:6px;">${c.planName}</div>
+      <div class="comment-text">${c.text}</div>
+    `;
+    allList.appendChild(item);
+  });
+  pane.appendChild(allList);
+
+  // 提案別
+  const planHeader = document.createElement('div');
+  planHeader.innerHTML = `<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:20px 0 8px;">提案別</div>`;
+  pane.appendChild(planHeader);
+
+  STATE.plans.forEach(p => {
+    const group = byPlan[p.id];
+    if (group.comments.length === 0) return;
+    const el = document.createElement('div');
+    el.className = 'comment-plan-group';
+    const commentsHTML = group.comments.map(c => `
+      <div class="comment-item">
+        <div class="comment-meta">${c.voter} ・ ${c.time}</div>
+        <div class="comment-text">${c.text}</div>
+      </div>
+    `).join('');
+    el.innerHTML = `
+      <div class="comment-plan-title">
+        ${p.name}
+        <span class="comment-count-badge">${group.comments.length}件</span>
+      </div>
+      ${commentsHTML}
+    `;
+    pane.appendChild(el);
+  });
+}
+
+// ===== CSV EXPORT =====
 function exportResults() {
   const planTotals = STATE.plans.map(plan => {
     let total = 0;
     const row = { plan: plan.name, proposer: plan.proposer };
-    STATE.members.forEach(member => {
-      const amt = (STATE.votes[member] || {})[plan.id] || 0;
-      total += amt;
-      row[member] = amt;
+    STATE.members.forEach(m => {
+      const amt = (STATE.votes[m] || {})[plan.id] || 0;
+      total += amt; row[m] = amt;
     });
     row['合計'] = total;
     row['通過'] = total >= STATE.THRESHOLD ? 'YES' : 'NO';
     return row;
   });
-
-  const headers = ['事業名', '提案者', ...STATE.members, '合計（万円）', '通過判定'];
+  const headers = ['事業名','提案者',...STATE.members,'合計（万円）','通過判定'];
   const rows = planTotals.map(p => [p.plan, p.proposer, ...STATE.members.map(m => p[m] || 0), p['合計'], p['通過']]);
   const csv = [headers, ...rows].map(r => r.map(v => `"${v}"`).join(',')).join('\n');
-
   const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
+  a.href = URL.createObjectURL(blob);
   a.download = '投資計画_投票結果.csv';
   a.click();
 }
 
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
+// ===== UTILS =====
+function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
 function confirmReset() { openModal('reset-modal'); }
-function resetAll() {
-  closeModal('reset-modal');
-  localStorage.removeItem('investmentVote2026');
-  location.reload();
-}
+function resetAll() { closeModal('reset-modal'); localStorage.removeItem('investmentVote2026'); location.reload(); }
 </script>
 </body>
 </html>
