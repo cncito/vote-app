@@ -401,7 +401,9 @@ const BUDGET = 1000;
 const THRESHOLD = 3000;
 
 // GASのURLはlocalStorageに保存（各端末で設定）
-let GAS_URL = localStorage.getItem('gasUrl') || '';
+// ★ デプロイ後にここにURLを貼り付ける ★
+const GAS_URL_DEFAULT = 'https://script.google.com/macros/s/AKfycbxQFYrRU9zmiixmsChmv4llXE0ThvOFCY8ZHluTMp08YTRqpRQyOV46IN1LgLI1DphqHw/exec';
+let GAS_URL = GAS_URL_DEFAULT || localStorage.getItem('gasUrl') || '';
 
 const STATE = {
   plans: [], members: [], votes: {}, comments: [],
