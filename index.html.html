@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>役員合宿2026 — 投資計画 投票システム</title>
+<style>
+  :root {
+    --bg: #0d0d1a;
+    --surface: #1a1a2e;
+    --surface2: #16213e;
+    --accent: #e94560;
+    --accent2: #ff6b35;
+    --gold: #f5c518;
+    --text: #e8e8f0;
+    --muted: #888899;
+    --border: #2a2a4a;
+    --pass: #00c896;
+    --fail: #e94560;
+    --budget: 1000;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', sans-serif; min-height: 100vh; }
+
+  /* ========== SCREENS ========== */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ========== ADMIN SCREEN ========== */
+  #admin-screen { padding: 24px; max-width: 900px; margin: 0 auto; }
+  .admin-header { text-align: center; padding: 32px 0 24px; }
+  .admin-header h1 { font-size: 28px; color: var(--accent); letter-spacing: 2px; }
+  .admin-header p { color: var(--muted); margin-top: 8px; font-size: 13px; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+  .card h2 { font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+  .plan-inputs { display: flex; flex-direction: column; gap: 12px; }
+  .plan-row { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; align-items: center; }
+  .plan-row input { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text); font-size: 14px; }
+  .plan-row input:focus { outline: none; border-color: var(--accent); }
+
+  .add-btn { background: none; border: 2px dashed var(--border); color: var(--muted); border-radius: 8px; padding: 12px; width: 100%; cursor: pointer; font-size: 13px; margin-top: 8px; }
+  .add-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .members-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+  .member-row { display: flex; gap: 8px; align-items: center; }
+  .member-row input { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; color: var(--text); font-size: 13px; }
+  .member-row input:focus { outline: none; border-color: var(--accent); }
+
+  .primary-btn { background: var(--accent); color: white; border: none; border-radius: 10px; padding: 16px 32px; font-size: 16px; font-weight: 700; cursor: pointer; width: 100%; letter-spacing: 1px; }
+  .primary-btn:hover { opacity: 0.9; }
+
+  /* ========== VOTER SCREEN ========== */
+  #voter-screen { min-height: 100vh; display: flex; flex-direction: column; }
+  .voter-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .voter-header .brand { color: var(--accent); font-weight: 700; font-size: 14px; letter-spacing: 1px; }
+  .voter-header .voter-info { font-size: 13px; color: var(--muted); }
+
+  .budget-bar { background: var(--surface2); border-bottom: 1px solid var(--border); padding: 20px 24px; }
+  .budget-label { font-size: 12px; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+  .budget-display { display: flex; align-items: center; gap: 16px; }
+  .budget-number { font-size: 36px; font-weight: 900; }
+  .budget-number.ok { color: var(--pass); }
+  .budget-number.warn { color: var(--accent2); }
+  .budget-number.over { color: var(--accent); }
+  .budget-unit { font-size: 14px; color: var(--muted); }
+  .budget-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .budget-fill { height: 100%; border-radius: 4px; transition: width 0.3s, background 0.3s; }
+
+  .plans-container { flex: 1; padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+  .plan-card { background: var(--surface); border: 2px solid var(--border); border-radius: 14px; padding: 20px; transition: border-color 0.2s; }
+  .plan-card.has-vote { border-color: var(--accent); }
+  .plan-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+  .plan-name { font-size: 18px; font-weight: 700; }
+  .plan-proposer { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .plan-badge { font-size: 11px; background: rgba(233,69,96,0.15); color: var(--accent); padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(233,69,96,0.3); white-space: nowrap; }
+
+  .vote-control { display: flex; align-items: center; gap: 12px; }
+  .vote-btn { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--border); background: var(--bg); color: var(--text); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .vote-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .vote-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .vote-amount { font-size: 28px; font-weight: 900; min-width: 80px; text-align: center; }
+  .vote-amount span { font-size: 14px; color: var(--muted); font-weight: 400; }
+  .vote-slider { width: 100%; margin-top: 12px; -webkit-appearance: none; height: 6px; border-radius: 3px; background: var(--border); outline: none; }
+  .vote-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); cursor: pointer; }
+
+  .plan-card.own-plan { opacity: 0.5; border-style: dashed; }
+  .own-badge { background: rgba(255,255,255,0.05) !important; color: var(--muted) !important; border-color: var(--border) !important; }
+  .own-plan-notice { text-align: center; padding: 14px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); margin-top: 8px; }
+
+  .submit-area { padding: 20px 24px; background: var(--surface); border-top: 1px solid var(--border); }
+  .submit-summary { font-size: 13px; color: var(--muted); margin-bottom: 12px; text-align: center; }
+  .submit-btn { background: var(--accent); color: white; border: none; border-radius: 10px; padding: 16px; font-size: 16px; font-weight: 700; cursor: pointer; width: 100%; letter-spacing: 1px; }
+  .submit-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+  .submit-btn:not(:disabled):hover { opacity: 0.9; }
+
+  /* ========== RESULTS SCREEN ========== */
+  #results-screen { padding: 0; }
+  .results-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .results-header h1 { font-size: 20px; font-weight: 700; }
+  .results-header .controls { display: flex; gap: 10px; }
+  .ctrl-btn { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 8px; padding: 8px 16px; cursor: pointer; font-size: 13px; }
+  .ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .ctrl-btn.danger { border-color: var(--accent); color: var(--accent); }
+
+  .results-summary { padding: 20px 24px; background: var(--surface2); border-bottom: 1px solid var(--border); display: flex; gap: 24px; flex-wrap: wrap; }
+  .stat-box { text-align: center; }
+  .stat-value { font-size: 32px; font-weight: 900; }
+  .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+  .results-grid { padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+  .result-card { background: var(--surface); border: 2px solid var(--border); border-radius: 14px; padding: 20px; position: relative; overflow: hidden; }
+  .result-card.passed { border-color: var(--pass); }
+  .result-card.passed::before { content: "PASS"; position: absolute; top: 12px; right: 12px; background: var(--pass); color: white; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; letter-spacing: 1px; }
+  .result-card.failed::before { content: "FAIL"; position: absolute; top: 12px; right: 12px; background: var(--border); color: var(--muted); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; letter-spacing: 1px; }
+
+  .result-plan-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .result-proposer { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+  .result-total { font-size: 36px; font-weight: 900; margin-bottom: 4px; }
+  .result-total.pass-color { color: var(--pass); }
+  .result-total.fail-color { color: var(--muted); }
+  .result-bar-wrap { height: 12px; background: var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 16px; }
+  .result-bar { height: 100%; border-radius: 6px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+
+  .voter-breakdown { display: flex; flex-direction: column; gap: 6px; }
+  .voter-row { display: flex; align-items: center; gap: 10px; }
+  .voter-name { width: 80px; font-size: 12px; color: var(--muted); flex-shrink: 0; }
+  .voter-bar-wrap { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .voter-bar { height: 100%; border-radius: 4px; background: var(--accent); transition: width 0.8s; }
+  .voter-vote { width: 70px; text-align: right; font-size: 12px; color: var(--text); }
+
+  .threshold-line { display: flex; align-items: center; gap: 12px; margin: 8px 0; }
+  .threshold-text { font-size: 11px; color: var(--gold); white-space: nowrap; }
+  .threshold-divider { flex: 1; height: 1px; background: var(--gold); opacity: 0.4; border: none; }
+
+  /* ========== MODALS ========== */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; max-width: 400px; width: 90%; }
+  .modal h3 { font-size: 18px; margin-bottom: 12px; }
+  .modal p { color: var(--muted); font-size: 14px; margin-bottom: 20px; line-height: 1.6; }
+  .modal-btns { display: flex; gap: 10px; }
+  .modal-btns button { flex: 1; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; }
+  .modal-cancel { background: var(--border); color: var(--muted); }
+  .modal-confirm { background: var(--accent); color: white; }
+
+  /* ========== SELECT VOTER SCREEN ========== */
+  #select-voter-screen { padding: 24px; max-width: 600px; margin: 0 auto; }
+  .select-voter-header { text-align: center; padding: 40px 0 32px; }
+  .select-voter-header h1 { font-size: 24px; font-weight: 700; }
+  .select-voter-header p { color: var(--muted); margin-top: 8px; }
+  .voter-select-grid { display: flex; flex-direction: column; gap: 12px; }
+  .voter-select-btn { background: var(--surface); border: 2px solid var(--border); border-radius: 12px; padding: 18px 24px; text-align: left; cursor: pointer; color: var(--text); font-size: 15px; font-weight: 600; transition: all 0.15s; display: flex; align-items: center; gap: 12px; }
+  .voter-select-btn:hover { border-color: var(--accent); background: rgba(233,69,96,0.05); }
+  .voter-select-btn.voted { border-color: var(--pass); opacity: 0.6; }
+  .voter-select-btn .voted-badge { font-size: 11px; background: var(--pass); color: white; padding: 2px 8px; border-radius: 10px; margin-left: auto; }
+  .voter-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0; }
+
+  /* ========== ANIMATIONS ========== */
+  @keyframes countUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .animate-in { animation: countUp 0.5s ease forwards; }
+
+  /* ========== RESPONSIVE ========== */
+  @media (min-width: 768px) {
+    .plans-container { max-width: 700px; margin: 0 auto; }
+    .results-grid { max-width: 700px; margin: 0 auto; }
+    .submit-area { max-width: 700px; margin: 0 auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ADMIN SETUP SCREEN -->
+<div id="admin-screen" class="screen active">
+  <div class="admin-header">
+    <h1>INVESTMENT VOTE 2026</h1>
+    <p>管理者セットアップ — 役員9名の氏名と事業名を入力してください</p>
+  </div>
+
+  <div class="card">
+    <h2>発表者 ＝ 投票者（全9名）</h2>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">各自の氏名と事業名を入力。自分の提案には投票できません。</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;color:var(--muted);padding:0 4px 6px;">
+      <span>氏名</span><span>事業名</span>
+    </div>
+    <div class="plan-inputs" id="plan-inputs"></div>
+  </div>
+
+  <button class="primary-btn" onclick="startSession()">▶ 投票セッション開始</button>
+</div>
+
+<!-- SELECT VOTER SCREEN -->
+<div id="select-voter-screen" class="screen">
+  <div class="select-voter-header">
+    <h1>投票者を選択してください</h1>
+    <p>あなたの名前をタップして投票を開始</p>
+  </div>
+  <div class="voter-select-grid" id="voter-select-grid"></div>
+  <div style="margin-top: 20px; text-align: center;">
+    <button class="ctrl-btn" onclick="showResults()">📊 現在の集計を確認</button>
+  </div>
+</div>
+
+<!-- VOTER SCREEN -->
+<div id="voter-screen" class="screen">
+  <div class="voter-header">
+    <div class="brand">INVESTMENT VOTE 2026</div>
+    <div class="voter-info" id="voter-info-label"></div>
+  </div>
+  <div class="budget-bar">
+    <div class="budget-label">残り投資可能額</div>
+    <div class="budget-display">
+      <div class="budget-number ok" id="remaining-display">1,000</div>
+      <div class="budget-unit">万円</div>
+      <div class="budget-track">
+        <div class="budget-fill" id="budget-fill" style="width: 100%; background: var(--pass);"></div>
+      </div>
+    </div>
+  </div>
+  <div class="plans-container" id="plans-container"></div>
+  <div class="submit-area">
+    <div class="submit-summary" id="submit-summary">投資額を配分して「投票を確定」してください</div>
+    <button class="submit-btn" id="submit-btn" onclick="confirmSubmit()">投票を確定する</button>
+  </div>
+</div>
+
+<!-- RESULTS SCREEN -->
+<div id="results-screen" class="screen">
+  <div class="results-header">
+    <h1>📊 リアルタイム集計</h1>
+    <div class="controls">
+      <button class="ctrl-btn" onclick="showSelectVoter()">← 投票に戻る</button>
+      <button class="ctrl-btn" onclick="exportResults()">CSV出力</button>
+      <button class="ctrl-btn danger" onclick="confirmReset()">リセット</button>
+    </div>
+  </div>
+  <div class="results-summary" id="results-summary"></div>
+  <div class="results-grid" id="results-grid"></div>
+</div>
+
+<!-- MODAL: Submit Confirm -->
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <h3>投票を確定しますか？</h3>
+    <p id="submit-modal-text"></p>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal('submit-modal')">見直す</button>
+      <button class="modal-confirm" onclick="submitVote()">確定する</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Reset Confirm -->
+<div class="modal-overlay" id="reset-modal">
+  <div class="modal">
+    <h3>全データをリセットしますか？</h3>
+    <p>すべての投票データが削除されます。この操作は元に戻せません。</p>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal('reset-modal')">キャンセル</button>
+      <button class="modal-confirm" onclick="resetAll()">リセットする</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== STATE =====
+const STATE = {
+  plans: [],       // { id, proposer, name }
+  members: [],     // string[]
+  votes: {},       // { [memberId]: { [planId]: amount } }
+  currentVoter: null,
+  BUDGET: 1000,    // 万円
+  THRESHOLD: 3000, // 通過ライン
+};
+
+// ===== INIT =====
+window.addEventListener('load', () => {
+  // 9名分の入力行を生成
+  const planInputs = document.getElementById('plan-inputs');
+  planInputs.innerHTML = '';
+  for (let i = 0; i < 9; i++) {
+    const row = document.createElement('div');
+    row.className = 'plan-row';
+    row.innerHTML = `
+      <input type="text" placeholder="例：山田 太郎" class="plan-proposer-input">
+      <input type="text" placeholder="例：AI採用支援プラットフォーム" class="plan-name-input">
+    `;
+    planInputs.appendChild(row);
+  }
+
+  loadFromStorage();
+});
+
+function loadFromStorage() {
+  const saved = localStorage.getItem('investmentVote2026');
+  if (!saved) return;
+  try {
+    const data = JSON.parse(saved);
+    Object.assign(STATE, data);
+    if (STATE.plans.length > 0 && STATE.members.length > 0) {
+      // すでにセッション開始済みなら投票者選択画面へ
+      showSelectVoter();
+    }
+  } catch(e) {}
+}
+
+function saveToStorage() {
+  localStorage.setItem('investmentVote2026', JSON.stringify({
+    plans: STATE.plans,
+    members: STATE.members,
+    votes: STATE.votes,
+  }));
+}
+
+// ===== ADMIN =====
+function startSession() {
+  const proposerInputs = document.querySelectorAll('.plan-proposer-input');
+  const nameInputs = document.querySelectorAll('.plan-name-input');
+
+  STATE.plans = [];
+  STATE.members = [];
+
+  proposerInputs.forEach((inp, i) => {
+    const proposer = inp.value.trim();
+    const name = nameInputs[i].value.trim();
+    if (proposer && name) {
+      STATE.plans.push({ id: `plan_${i}`, proposer, name });
+      STATE.members.push(proposer);
+    }
+  });
+
+  if (STATE.plans.length === 0) { alert('氏名と事業名を1件以上入力してください'); return; }
+
+  STATE.votes = {};
+  saveToStorage();
+  showSelectVoter();
+}
+
+// ===== SELECT VOTER =====
+function showSelectVoter() {
+  showScreen('select-voter-screen');
+  const grid = document.getElementById('voter-select-grid');
+  grid.innerHTML = '';
+  STATE.members.forEach((name) => {
+    const hasVoted = !!STATE.votes[name];
+    const btn = document.createElement('button');
+    btn.className = `voter-select-btn ${hasVoted ? 'voted' : ''}`;
+    const initial = name.charAt(0);
+    btn.innerHTML = `
+      <div class="voter-avatar">${initial}</div>
+      <span>${name}</span>
+      ${hasVoted ? '<span class="voted-badge">投票済</span>' : ''}
+    `;
+    if (!hasVoted) btn.onclick = () => startVoting(name);
+    grid.appendChild(btn);
+  });
+}
+
+// ===== VOTER =====
+function startVoting(voterName) {
+  STATE.currentVoter = voterName;
+  document.getElementById('voter-info-label').textContent = voterName + ' の投票';
+
+  // 現在の投票状態（再投票対応）
+  const currentVotes = STATE.votes[voterName] || {};
+
+  const container = document.getElementById('plans-container');
+  container.innerHTML = '';
+
+  STATE.plans.forEach(plan => {
+    const isOwn = plan.proposer === voterName;
+    const currentAmount = isOwn ? 0 : (currentVotes[plan.id] || 0);
+    const card = document.createElement('div');
+    card.className = `plan-card ${currentAmount > 0 ? 'has-vote' : ''} ${isOwn ? 'own-plan' : ''}`;
+    card.id = `card_${plan.id}`;
+
+    if (isOwn) {
+      card.innerHTML = `
+        <div class="plan-card-header">
+          <div>
+            <div class="plan-name">${plan.name}</div>
+            <div class="plan-proposer">提案者：${plan.proposer}</div>
+          </div>
+          <div class="plan-badge own-badge">自分の提案</div>
+        </div>
+        <div class="own-plan-notice">自分の提案には投票できません</div>
+      `;
+    } else {
+      card.innerHTML = `
+        <div class="plan-card-header">
+          <div>
+            <div class="plan-name">${plan.name}</div>
+            <div class="plan-proposer">提案者：${plan.proposer}</div>
+          </div>
+          <div class="plan-badge">投資可能</div>
+        </div>
+        <div class="vote-control">
+          <button class="vote-btn" onclick="adjustVote('${plan.id}', -100)" id="minus_${plan.id}">−</button>
+          <div class="vote-amount" id="amount_${plan.id}">${currentAmount.toLocaleString()}<span>万円</span></div>
+          <button class="vote-btn" onclick="adjustVote('${plan.id}', 100)" id="plus_${plan.id}">＋</button>
+        </div>
+        <input type="range" class="vote-slider" id="slider_${plan.id}"
+          min="0" max="${STATE.BUDGET}" step="100" value="${currentAmount}"
+          oninput="setVoteFromSlider('${plan.id}', this.value)">
+      `;
+    }
+    container.appendChild(card);
+  });
+
+  // 初期化（自分の提案は常に0固定）
+  if (!STATE.votes[voterName]) STATE.votes[voterName] = {};
+  STATE.plans.forEach(p => {
+    if (p.proposer === voterName) STATE.votes[voterName][p.id] = 0;
+    else if (STATE.votes[voterName][p.id] === undefined) STATE.votes[voterName][p.id] = 0;
+  });
+
+  updateBudgetDisplay();
+  showScreen('voter-screen');
+}
+
+function getVoterVotes() {
+  return STATE.votes[STATE.currentVoter] || {};
+}
+
+function getTotalAllocated() {
+  const votes = getVoterVotes();
+  return Object.values(votes).reduce((a, b) => a + b, 0);
+}
+
+function adjustVote(planId, delta) {
+  const votes = getVoterVotes();
+  const current = votes[planId] || 0;
+  const total = getTotalAllocated();
+  const remaining = STATE.BUDGET - total;
+  let next = current + delta;
+  if (next < 0) next = 0;
+  if (delta > 0 && remaining < delta) next = current; // 残余不足
+  votes[planId] = next;
+  STATE.votes[STATE.currentVoter] = votes;
+  updateVotePlanDisplay(planId);
+  updateBudgetDisplay();
+}
+
+function setVoteFromSlider(planId, value) {
+  const votes = getVoterVotes();
+  const current = votes[planId] || 0;
+  const newVal = parseInt(value);
+  const total = getTotalAllocated() - current + newVal;
+  if (total > STATE.BUDGET) {
+    document.getElementById(`slider_${planId}`).value = current;
+    return;
+  }
+  votes[planId] = newVal;
+  STATE.votes[STATE.currentVoter] = votes;
+  updateVotePlanDisplay(planId);
+  updateBudgetDisplay();
+}
+
+function updateVotePlanDisplay(planId) {
+  const votes = getVoterVotes();
+  const amount = votes[planId] || 0;
+  document.getElementById(`amount_${planId}`).innerHTML = `${amount.toLocaleString()}<span>万円</span>`;
+  document.getElementById(`slider_${planId}`).value = amount;
+  const card = document.getElementById(`card_${planId}`);
+  if (amount > 0) card.classList.add('has-vote');
+  else card.classList.remove('has-vote');
+}
+
+function updateBudgetDisplay() {
+  const total = getTotalAllocated();
+  const remaining = STATE.BUDGET - total;
+  const pct = (total / STATE.BUDGET) * 100;
+
+  const display = document.getElementById('remaining-display');
+  const fill = document.getElementById('budget-fill');
+  display.textContent = remaining.toLocaleString();
+
+  if (remaining > 300) {
+    display.className = 'budget-number ok';
+    fill.style.background = 'var(--pass)';
+  } else if (remaining > 0) {
+    display.className = 'budget-number warn';
+    fill.style.background = 'var(--accent2)';
+  } else {
+    display.className = 'budget-number over';
+    fill.style.background = 'var(--accent)';
+  }
+  fill.style.width = `${100 - pct}%`;
+
+  // submit button state
+  const submitBtn = document.getElementById('submit-btn');
+  const summary = document.getElementById('submit-summary');
+  if (total === 0) {
+    submitBtn.disabled = true;
+    summary.textContent = '1万円以上投資してから確定してください';
+  } else if (remaining < 0) {
+    submitBtn.disabled = true;
+    summary.textContent = `⚠ 予算オーバー（${Math.abs(remaining)}万円超過）`;
+  } else {
+    submitBtn.disabled = false;
+    summary.textContent = `投資合計：${total}万円 / 残り：${remaining}万円`;
+  }
+}
+
+function confirmSubmit() {
+  const total = getTotalAllocated();
+  const votes = getVoterVotes();
+  let lines = [];
+  STATE.plans.forEach(p => {
+    const amt = votes[p.id] || 0;
+    if (amt > 0) lines.push(`・${p.name}：${amt}万円`);
+  });
+  if (lines.length === 0) return;
+  document.getElementById('submit-modal-text').textContent =
+    `以下の配分で投票を確定します：\n${lines.join('\n')}\n\n合計：${total}万円`;
+  openModal('submit-modal');
+}
+
+function submitVote() {
+  closeModal('submit-modal');
+  saveToStorage();
+  showSelectVoter();
+}
+
+// ===== RESULTS =====
+function showResults() {
+  showScreen('results-screen');
+  renderResults();
+}
+
+function renderResults() {
+  const votedCount = Object.keys(STATE.votes).filter(k =>
+    Object.values(STATE.votes[k]).some(v => v > 0)
+  ).length;
+
+  // サマリー
+  const summary = document.getElementById('results-summary');
+  summary.innerHTML = `
+    <div class="stat-box">
+      <div class="stat-value" style="color:var(--accent)">${votedCount}</div>
+      <div class="stat-label">投票済み</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-value" style="color:var(--muted)">${STATE.members.length - votedCount}</div>
+      <div class="stat-label">未投票</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-value" style="color:var(--gold)">${STATE.members.length}</div>
+      <div class="stat-label">合計人数</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-value" style="color:var(--pass)">${STATE.THRESHOLD.toLocaleString()}万円</div>
+      <div class="stat-label">通過ライン</div>
+    </div>
+  `;
+
+  // 各プランの集計
+  const planTotals = STATE.plans.map(plan => {
+    let total = 0;
+    const breakdown = [];
+    STATE.members.forEach(member => {
+      const amt = (STATE.votes[member] || {})[plan.id] || 0;
+      total += amt;
+      breakdown.push({ member, amt });
+    });
+    return { ...plan, total, breakdown };
+  });
+
+  // 降順ソート
+  planTotals.sort((a, b) => b.total - a.total);
+
+  const maxTotal = Math.max(...planTotals.map(p => p.total), STATE.THRESHOLD);
+  const grid = document.getElementById('results-grid');
+  grid.innerHTML = '';
+
+  planTotals.forEach((plan, idx) => {
+    const passed = plan.total >= STATE.THRESHOLD;
+    const card = document.createElement('div');
+    card.className = `result-card ${passed ? 'passed' : 'failed'} animate-in`;
+    card.style.animationDelay = `${idx * 0.1}s`;
+
+    const barPct = maxTotal > 0 ? (plan.total / maxTotal) * 100 : 0;
+    const barColor = passed ? 'var(--pass)' : 'var(--muted)';
+    const totalColor = passed ? 'pass-color' : 'fail-color';
+
+    const breakdownHTML = plan.breakdown.map(b => {
+      const bPct = STATE.BUDGET > 0 ? (b.amt / STATE.BUDGET) * 100 : 0;
+      return `
+        <div class="voter-row">
+          <div class="voter-name">${b.member}</div>
+          <div class="voter-bar-wrap">
+            <div class="voter-bar" style="width: ${bPct}%; background: ${b.amt > 0 ? 'var(--accent)' : 'transparent'}"></div>
+          </div>
+          <div class="voter-vote">${b.amt > 0 ? b.amt + '万円' : '—'}</div>
+        </div>
+      `;
+    }).join('');
+
+    card.innerHTML = `
+      <div class="result-plan-name">${plan.name}</div>
+      <div class="result-proposer">提案者：${plan.proposer}</div>
+      <div class="result-total ${totalColor}">${plan.total.toLocaleString()}<span style="font-size:16px;color:var(--muted);font-weight:400">万円</span></div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">通過ライン：${STATE.THRESHOLD.toLocaleString()}万円${passed ? ' ✅ 通過' : ` （あと${(STATE.THRESHOLD - plan.total).toLocaleString()}万円）`}</div>
+      <div class="result-bar-wrap">
+        <div class="result-bar" style="width:${barPct}%; background:${barColor}"></div>
+      </div>
+      <hr class="threshold-line" style="border:none;">
+      <div class="voter-breakdown">${breakdownHTML}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// ===== CSV EXPORT =====
+function exportResults() {
+  const planTotals = STATE.plans.map(plan => {
+    let total = 0;
+    const row = { plan: plan.name, proposer: plan.proposer };
+    STATE.members.forEach(member => {
+      const amt = (STATE.votes[member] || {})[plan.id] || 0;
+      total += amt;
+      row[member] = amt;
+    });
+    row['合計'] = total;
+    row['通過'] = total >= STATE.THRESHOLD ? 'YES' : 'NO';
+    return row;
+  });
+
+  const headers = ['事業名', '提案者', ...STATE.members, '合計（万円）', '通過判定'];
+  const rows = planTotals.map(p => [p.plan, p.proposer, ...STATE.members.map(m => p[m] || 0), p['合計'], p['通過']]);
+  const csv = [headers, ...rows].map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '投資計画_投票結果.csv';
+  a.click();
+}
+
+// ===== UTILS =====
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function confirmReset() { openModal('reset-modal'); }
+function resetAll() {
+  closeModal('reset-modal');
+  localStorage.removeItem('investmentVote2026');
+  location.reload();
+}
+</script>
+</body>
+</html>
