@@ -823,37 +823,40 @@ function renderComments() {
   pane.appendChild(hdr);
 
   // 全件リスト（時系列）
-  [...STATE.comments].sort((a,b) => a.timestamp - b.timestamp).forEach(c => {
-    const card = document.createElement('div');
-    card.className = 'all-comment-card';
+  [...STATE.comments].sort((a,b) => (a.timestamp||0) - (b.timestamp||0)).forEach(c => {
+    try {
+      const card = document.createElement('div');
+      card.className = 'all-comment-card';
 
-    const headerRow = document.createElement('div');
-    headerRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:6px;';
+      const headerRow = document.createElement('div');
+      headerRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:6px;';
 
-    const avatar = document.createElement('div');
-    avatar.className = 'comment-avatar';
-    avatar.textContent = c.voter.charAt(0);
+      const voter = c.voter || c.name || '?';
+      const avatar = document.createElement('div');
+      avatar.className = 'comment-avatar';
+      avatar.textContent = voter.charAt(0);
 
-    const who = document.createElement('div');
-    who.style.cssText = 'font-size:13px;font-weight:700;';
-    who.textContent = c.voter;
+      const who = document.createElement('div');
+      who.style.cssText = 'font-size:13px;font-weight:700;';
+      who.textContent = voter;
 
-    const when = document.createElement('div');
-    when.style.cssText = 'font-size:11px;color:var(--muted);margin-left:auto;';
-    when.textContent = c.time;
+      const when = document.createElement('div');
+      when.style.cssText = 'font-size:11px;color:var(--muted);margin-left:auto;';
+      when.textContent = c.time || '';
 
-    headerRow.appendChild(avatar); headerRow.appendChild(who); headerRow.appendChild(when);
+      headerRow.appendChild(avatar); headerRow.appendChild(who); headerRow.appendChild(when);
 
-    const tag = document.createElement('div');
-    tag.className = 'comment-plan-tag';
-    tag.textContent = c.planName;
+      const tag = document.createElement('div');
+      tag.className = 'comment-plan-tag';
+      tag.textContent = c.planName || '';
 
-    const text = document.createElement('div');
-    text.className = 'comment-text-content';
-    text.textContent = c.text; // textContent でXSS防止
+      const text = document.createElement('div');
+      text.className = 'comment-text-content';
+      text.textContent = c.text || '';
 
-    card.appendChild(headerRow); card.appendChild(tag); card.appendChild(text);
-    pane.appendChild(card);
+      card.appendChild(headerRow); card.appendChild(tag); card.appendChild(text);
+      pane.appendChild(card);
+    } catch(e) { console.error('comment render error', e, c); }
   });
 
   // 提案別
