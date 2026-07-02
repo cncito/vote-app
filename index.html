@@ -465,13 +465,9 @@ async function gasGet(action, params = {}) {
   return json.data;
 }
 
+// GASはPOSTのリダイレクト時にボディが消えるため、書き込みもGETで送る
 async function gasPost(action, params = {}) {
-  const body = new URLSearchParams({ action });
-  Object.entries(params).forEach(([k, v]) => body.set(k, typeof v === 'string' ? v : JSON.stringify(v)));
-  const res = await fetch(GAS_URL, { method: 'POST', body, redirect: 'follow' });
-  const json = await res.json();
-  if (!json.ok) throw new Error(json.error || 'API error');
-  return json.data;
+  return gasGet(action, params);
 }
 
 // ===== GAS URL 設定 =====
