@@ -255,7 +255,7 @@
     </button>
     <button onclick="showVoteResults()" style="background:none;border:none;color:var(--accent);font-size:13px;cursor:pointer;text-align:left;padding:2px 4px;text-decoration:underline;">📊 投票集計を見る</button>
     <div class="home-secondary">
-      <button onclick="showAdmin()">⚙ 設定を編集</button>
+      <button onclick="adminAuth()">⚙ 設定を編集</button>
     </div>
   </div>
 </div>
@@ -319,7 +319,7 @@
 <!-- VOTE RESULTS (管理者用) -->
 <div id="vote-results-screen" class="screen">
   <div class="app-header">
-    <button class="back-btn" onclick="showAdmin()">←</button>
+    <button class="back-btn" onclick="goHome()">←</button>
     <div class="title">投票集計</div>
     <button class="back-btn" style="margin-left:auto;font-size:18px;" onclick="fetchAndRenderVotes()">↻</button>
   </div>
@@ -542,6 +542,18 @@ async function startSession() {
   } catch(e) {
     hideLoading();
     alert('エラー: ' + e.message);
+  }
+}
+
+const ADMIN_PASS = '2026DM';
+
+function adminAuth() {
+  const input = prompt('管理者パスワードを入力してください');
+  if (input === null) return;
+  if (input === ADMIN_PASS) {
+    showAdmin();
+  } else {
+    alert('パスワードが違います');
   }
 }
 
@@ -1065,7 +1077,7 @@ async function resetAll() {
   closeModal('reset-modal');
   showLoading('リセット中...');
   try {
-    const data = await gasPost('reset');
+    const data = await gasPost('reset', { key: ADMIN_PASS });
     applyServerData(data);
     hideLoading();
     showAdmin();
