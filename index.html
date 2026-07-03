@@ -690,19 +690,15 @@ async function submitComment() {
     timestamp: now.getTime(),
   };
 
-  document.getElementById('comment-send-btn').disabled = true;
-  showLoading('記録中...');
-  try {
-    const data = await gasPost('submitComment', { comment });
-    applyServerData(data);
-    hideLoading();
-    document.getElementById('comment-done-text').textContent = `「${plan.name}」の意見を記録しました`;
-    document.getElementById('comment-done-popup').classList.add('open');
-  } catch(e) {
-    hideLoading();
-    alert('記録に失敗しました: ' + e.message);
-    document.getElementById('comment-send-btn').disabled = false;
-  }
+  // 即座にローカルに追加して画面を更新（UX優先）
+  STATE.comments.push(comment);
+  localStorage.setItem('gasCache', JSON.stringify({ plans: STATE.plans, members: STATE.members, votes: STATE.votes, comments: STATE.comments }));
+
+  document.getElementById('comment-done-text').textContent = `「${plan.name}」の意見を記録しました`;
+  document.getElementById('comment-done-popup').classList.add('open');
+
+  // バックグラウンドでGASに保存
+  gasPost('submitComment', { comment }).catch(e => console.error('GAS保存失敗:', e));
 }
 
 function closeCommentDoneContinue() {
@@ -807,20 +803,17 @@ function confirmSubmit() {
 
 async function submitVote() {
   closeModal('submit-modal');
-  showLoading('投票を送信中...');
-  try {
-    const data = await gasPost('submitVote', {
-      voter: STATE.currentVoter,
-      votes: STATE.votes[STATE.currentVoter],
-    });
-    applyServerData(data);
-    hideLoading();
-    document.getElementById('vote-done-text').textContent = `${STATE.currentVoter} さんの投票を記録しました`;
-    document.getElementById('vote-done-popup').classList.add('open');
-  } catch(e) {
-    hideLoading();
-    alert('投票の送信に失敗しました: ' + e.message);
-  }
+
+  // 即座にローカルに保存して完了表示
+  localStorage.setItem('gasCache', JSON.stringify({ plans: STATE.plans, members: STATE.members, votes: STATE.votes, comments: STATE.comments }));
+  document.getElementById('vote-done-text').textContent = `${STATE.currentVoter} さんの投票を記録しました`;
+  document.getElementById('vote-done-popup').classList.add('open');
+
+  // バックグラウンドでGASに保存
+  gasPost('submitVote', {
+    voter: STATE.currentVoter,
+    votes: STATE.votes[STATE.currentVoter],
+  }).catch(e => console.error('GAS保存失敗:', e));
 }
 
 function closeVoteDone() {
