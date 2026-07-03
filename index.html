@@ -421,12 +421,39 @@ window.addEventListener('load', async () => {
     return;
   }
 
+  // キャッシュがあれば即座に表示
+  const cached = localStorage.getItem('gasCache');
+  if (cached) {
+    try {
+      const data = JSON.parse(cached);
+      applyServerData(data);
+      const savedVoter = localStorage.getItem('currentVoter');
+      if (data.plans && data.plans.length > 0) {
+        if (savedVoter && data.members && data.members.includes(savedVoter)) {
+          STATE.currentVoter = savedVoter;
+          showHome();
+        } else {
+          showNameSelect();
+        }
+      } else {
+        showScreen('admin-screen');
+      }
+      // バックグラウンドで最新データを取得
+      gasGet('getData').then(latest => {
+        applyServerData(latest);
+        localStorage.setItem('gasCache', JSON.stringify(latest));
+      }).catch(() => {});
+      return;
+    } catch(e) {}
+  }
+
+  // キャッシュなし → ローディング表示して取得
   showLoading('データを読み込み中...');
   try {
     const data = await gasGet('getData');
     applyServerData(data);
+    localStorage.setItem('gasCache', JSON.stringify(data));
     hideLoading();
-
     const savedVoter = localStorage.getItem('currentVoter');
     if (data.plans && data.plans.length > 0) {
       if (savedVoter && data.members && data.members.includes(savedVoter)) {
@@ -451,6 +478,7 @@ function applyServerData(data) {
   STATE.members  = data.members  || [];
   STATE.votes    = data.votes    || {};
   STATE.comments = data.comments || [];
+  localStorage.setItem('gasCache', JSON.stringify(data));
   saveBackup(data);
 }
 
